@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <texture.h>
 
 class QMapView : public QGLWidget
@@ -10,19 +11,26 @@ class QMapView : public QGLWidget
     Q_OBJECT
 private:
     GLuint textureID;
-    GLuint m_nPyramid;
-    GLfloat m_xRotate;//поворот по х
-    GLfloat m_yRotate;//поворот по у
+    GLuint m_nMap;
+    //GLfloat m_xRotate;//поворот по х
+    //GLfloat m_yRotate;//поворот по у
+    GLfloat pitch;
+    GLfloat roll;
+    GLfloat course;
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
     QPoint m_ptPosition;//координата указателя мыши в момент нажатия
 
 protected:
     virtual void initializeGL();
     virtual void resizeGL (int nWidth,int nHeight);
     virtual void paintGL ();
-    virtual void mousePressEvent(QMouseEvent *pe);
-    virtual void mouseMoveEvent(QMouseEvent *pe);
+    virtual void keyPressEvent(QKeyEvent *keyEvent);
+    //virtual void mousePressEvent(QMouseEvent *pe);
+    //virtual void mouseMoveEvent(QMouseEvent *pe);
     void genTextures();
-    GLuint createPyramid ();
+    GLuint createMap ();
 
 public:
     explicit QMapView(QWidget *parent = 0);

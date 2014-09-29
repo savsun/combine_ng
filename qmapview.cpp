@@ -1,10 +1,24 @@
 #include "qmapview.h"
 
 QMapView::QMapView(QWidget *parent) :
-    QGLWidget(parent),m_xRotate(0),m_yRotate(0)
+    QGLWidget(parent),pitch(0),roll(0),course(0), x(0),z(0),y(0.1)
 {
 }
-
+#define PAIR(top, bottom, param, step)\
+    case top:\
+    {\
+        param += step;\
+        updateGL();\
+        \
+        break;\
+    }\
+    case bottom:\
+    {\
+        param -= step;\
+        updateGL();\
+        \
+        break;\
+    }
 void QMapView::initializeGL()
 {
     qglClearColor(Qt::blue);//цвет для очистки буфера изображения
@@ -12,7 +26,7 @@ void QMapView::initializeGL()
     glEnable(GL_DEPTH_TEST); // устанавливает режим проверки глубины пикселей
     genTextures();
     //glShadeModel(GL_FLAT);//отключение сглаживания цветов по умолчанию
-    m_nPyramid=createPyramid();
+    m_nMap=createMap();
 }
 
 void QMapView::resizeGL(int nWidth, int nHeight)
@@ -20,7 +34,7 @@ void QMapView::resizeGL(int nWidth, int nHeight)
     glViewport(0,0,(GLint)nWidth, (GLint)nHeight);//размеры окна
     glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
     glLoadIdentity();//присваивает матрице проектирования единичную матрицу
-    glFrustum(-1.0,1.0,-1.0,1.0,1.0,10.0);//задает пространство видимости
+    glFrustum(-1.0,1.0,-1.0,1.0,1.0,50.0);//задает пространство видимости
 }
 
 void QMapView::paintGL( )
@@ -29,34 +43,61 @@ void QMapView::paintGL( )
 
     glMatrixMode(GL_MODELVIEW);//текущая матрица моделирования
     glLoadIdentity();
-    glTranslatef(0.0,0.0,-0.1);
+    //glTranslatef(0.0,0.0,-0.1);
 
-    glRotatef(m_xRotate,1.0,0.0,0.0);
-    glRotatef(m_yRotate,0.0,1.0,0.0);
+    //glRotatef(m_xRotate,1.0,0.0,0.0);
+    //glRotatef(m_yRotate,0.0,1.0,0.0);
 
+    glRotatef(pitch, 1, 0, 0);
+    glRotatef(roll, 0, 1, 0);
+    glRotatef(course +90, 0, 0, 1); // Докрутка на север
 
-    glCallList(m_nPyramid);
+    glTranslatef(- x, - z, - y);
+
+    glCallList(m_nMap);
 }
 
-void QMapView::mousePressEvent(QMouseEvent* pe)
+void QMapView::keyPressEvent(QKeyEvent* keyEvent)
+{
+    switch(keyEvent->key())
+     {
+        PAIR(Qt::Key_Q, Qt::Key_A, x, 0.1);
+        PAIR(Qt::Key_W, Qt::Key_S, z, 0.1);
+        PAIR(Qt::Key_E, Qt::Key_D, y, 0.01);
+        PAIR(Qt::Key_R, Qt::Key_F, course, 10);
+        PAIR(Qt::Key_T, Qt::Key_G, roll, 10);
+        PAIR(Qt::Key_Y, Qt::Key_H, pitch, 10);
+      default:
+      QGLWidget::keyPressEvent(keyEvent);
+      break;
+    }
+}
+
+/*void QMapView::mousePressEvent(QMouseEvent* pe)
 {
     m_ptPosition = pe->pos();
-}
+}*/
 
-void QMapView::mouseMoveEvent(QMouseEvent* pe)
+/*void QMapView::mouseMoveEvent(QMouseEvent* pe)
 {
-    m_xRotate += 180*(GLfloat)(pe->y() - m_ptPosition.y())/height();//углы поворота
-    m_yRotate += 180*(GLfloat)(pe->x() - m_ptPosition.x())/width();
+    pitch += 180*(GLfloat)(pe->y() - m_ptPosition.y())/height();//углы поворота
+    roll += 180*(GLfloat)(pe->x() - m_ptPosition.x())/width();
     updateGL();
 
     m_ptPosition = pe->pos();
-}
+}*/
 
 void QMapView::genTextures()
 {
     QImage image;
-    Texture texture_map;
-    image.load(texture_map.get("/home/alexandra/N3716.sxf"));
+    QFile file;
+    file.setFileName("texture.png");
+    if (! file.exists())
+    {
+        Texture texture_map;
+        texture_map.get("/home/alexandra/N3716.sxf");
+    }
+    image.load(file.fileName());
     image=QGLWidget::convertToGLFormat(image);
     glGenTextures(1,& textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -77,7 +118,7 @@ void QMapView::genTextures()
 
 }
 
-GLuint QMapView::createPyramid()
+GLuint QMapView::createMap()
 {
     GLuint n = glGenLists(1);
 

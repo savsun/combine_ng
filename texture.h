@@ -6,7 +6,7 @@ class Texture
 {
 public:
     Texture();
-    QString get(char* filenameMap );
+    void get(char* filenameMap );
 };
 
 #endif // TEXTURE_H

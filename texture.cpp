@@ -3,7 +3,7 @@
 Texture::Texture()
 {
 }
-QString Texture::get(char* filenameMap)
+void Texture::get(char* filenameMap)
 {
     OGRRegisterAll();
     OGRDataSource   *poDataset;
@@ -25,11 +25,10 @@ QString Texture::get(char* filenameMap)
     Mat result;
     int rows=4096;
     int cols=4096;
-    result=Mat::zeros(rows,cols, CV_32SC1);
+    result=Mat::zeros(rows,cols, CV_8UC3);
 
     //счетчик
     uint32_t sc=1;
-    int numberObjects=0;
 
     //Получение размеров рамки
     OGREnvelope env;
@@ -119,20 +118,15 @@ QString Texture::get(char* filenameMap)
                        }
                      }
 
-                    fillPoly(result, (const Point**) pts1,n,numRings1+1,Scalar::all(sc),8,0,Point());
+                    fillPoly(result, (const Point**) pts1,n,numRings1+1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
                 }
-                sc++;
+                sc+=0xFFFFFF/3000;
+                //sc++;
                 OGRFeature::DestroyFeature( poFeature );
-                numberObjects++;
              }
 
     CPLFree( panSuccess );
 
     OGRDataSource::DestroyDataSource( poDataset );
-
-
-    float q=32768/numberObjects;
-    QString filenameTexture="texture.png";
-    cv::imwrite(filenameTexture.toStdString(),result*q);
-    return filenameTexture;
+    cv::imwrite("texture.png",result);
 }
