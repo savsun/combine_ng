@@ -6,7 +6,7 @@ class Texture
 {
 public:
     Texture();
-    void get(char* filenameMap );
+    void get(QString filenameMap , int count_texture);
 };
 
 #endif // TEXTURE_H

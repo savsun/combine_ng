@@ -11,9 +11,10 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <math.h>
 
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 using namespace cv;
-
 #endif // ALL_H

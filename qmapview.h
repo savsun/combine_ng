@@ -5,12 +5,14 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <texture.h>
+#include <QDebug>
 
 class QMapView : public QGLWidget
 {
     Q_OBJECT
 private:
-    GLuint textureID;
+    GLuint* textureID;
+    //GLuint textureID;
     GLuint m_nMap;
     //GLfloat m_xRotate;//поворот по х
     //GLfloat m_yRotate;//поворот по у
@@ -20,7 +22,8 @@ private:
     GLfloat x;
     GLfloat y;
     GLfloat z;
-    QPoint m_ptPosition;//координата указателя мыши в момент нажатия
+    int count_texture;
+    //QPoint m_ptPosition;//координата указателя мыши в момент нажатия
 
 protected:
     virtual void initializeGL();
