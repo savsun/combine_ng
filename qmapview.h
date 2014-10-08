@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <texture.h>
 #include <QDebug>
+#include <parser.h>
 
 class QMapView : public QGLWidget
 {
@@ -16,13 +17,19 @@ private:
     GLuint m_nMap;
     //GLfloat m_xRotate;//поворот по х
     //GLfloat m_yRotate;//поворот по у
-    GLfloat pitch;
-    GLfloat roll;
-    GLfloat course;
-    GLfloat x;
-    GLfloat y;
-    GLfloat z;
-    int count_texture;
+    GLdouble pitch;
+    GLdouble roll;
+    GLdouble course;
+    GLdouble coord_x;
+    GLdouble coord_y;
+    GLdouble coord_z;
+    int countTexture;
+    QString filenameMap;
+    QString filenameVideo;
+    QString filenameXml;
+    int dimention;
+    Texture texture_map;
+    Parser handler;
     //QPoint m_ptPosition;//координата указателя мыши в момент нажатия
 
 protected:
@@ -36,7 +43,7 @@ protected:
     GLuint createMap ();
 
 public:
-    explicit QMapView(QWidget *parent = 0);
+    explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention,QWidget *parent = 0);
 
 signals:
 

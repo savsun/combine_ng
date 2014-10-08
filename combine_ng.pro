@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl xml testlib
 CONFIG += c++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,12 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     qmapview.cpp \
-    texture.cpp
+    texture.cpp \
+    model.cpp \
+    parser.cpp
 
 HEADERS  += mainwindow.h \
     qmapview.h \
     texture.h \
-    all.h
+    all.h \
+    model.h \
+    parser.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    model.ui
 LIBS+= -lgdal -lopencv_core -lopencv_imgproc -lopencv_highgui

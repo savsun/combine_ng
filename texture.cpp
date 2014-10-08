@@ -1,13 +1,77 @@
 #include "texture.h"
 
-Texture::Texture()
+Texture::Texture(QString filenameMap)
 {
+    _filenameMap=filenameMap;
+
+    OGRRegisterAll();
+    OGRDataSource   *poDataset;
+    poDataset = OGRSFDriverRegistrar::Open(_filenameMap.toStdString().c_str());
+    if( poDataset == NULL )
+        {
+            printf( "Open failed.\n" );
+            exit( 1 );
+        }
+
+    OGRLayer * system;
+    system=poDataset->GetLayerByName("LAYER13");
+    //Получение размеров рамки
+    system->GetExtent(& env);
+    OGRDataSource::DestroyDataSource( poDataset );
 }
-void Texture::get(QString filenameMap,int count_texture)
+ void Texture::transformGCP(double point[],int minXPixel,int minYPixel,int maxXPixel,int maxYPixel)
+{
+     /*float ax=(maxXPixel-minXPixel)/(env.MaxX-env.MinX);
+     float bx=minXPixel-ax*env.MinX;
+     float ay=(maxYPixel-minYPixel)/(env.MaxY-env.MinY);
+     float by=minYPixel-ay*env.MinY;
+     point[0]=ax*point[0]+bx;
+     point[1]=ay*point[1]+by;*/
+    //cout<<"minXPixel "<<minXPixel<<"minYPixel "<<minYPixel<<"maxXPixel"<<maxXPixel<<"maxYPixel "<<maxYPixel<<endl;
+    int *panSuccess = (int *) CPLCalloc(sizeof(int),1);
+    GDAL_GCP* array_GCP=new GDAL_GCP[4];
+    array_GCP[0].pszId="1";
+    array_GCP[0].pszInfo="";
+    array_GCP[0].dfGCPPixel=minXPixel;
+    array_GCP[0].dfGCPLine=minYPixel;
+    array_GCP[0].dfGCPX=env.MinX;
+    array_GCP[0].dfGCPY=env.MinY;
+    array_GCP[0].dfGCPZ=0;
+
+    array_GCP[1].pszId="2";
+    array_GCP[1].pszInfo="";
+    array_GCP[1].dfGCPPixel=maxXPixel;
+    array_GCP[1].dfGCPLine=maxYPixel;
+    array_GCP[1].dfGCPX=env.MaxX;
+    array_GCP[1].dfGCPY=env.MaxY;
+    array_GCP[1].dfGCPZ=0;
+
+    array_GCP[2].pszId="3";
+    array_GCP[2].pszInfo="";
+    array_GCP[2].dfGCPPixel=maxXPixel;
+    array_GCP[2].dfGCPLine=minYPixel;
+    array_GCP[2].dfGCPX=env.MaxX;
+    array_GCP[2].dfGCPY=env.MinY;
+    array_GCP[2].dfGCPZ=0;
+
+    array_GCP[3].pszId="4";
+    array_GCP[3].pszInfo="";
+    array_GCP[3].dfGCPPixel=minXPixel;
+    array_GCP[3].dfGCPLine=maxYPixel;
+    array_GCP[3].dfGCPX=env.MinX;
+    array_GCP[3].dfGCPY=env.MaxY;
+    array_GCP[3].dfGCPZ=0;
+
+    void *pTransformArg = GDALCreateGCPTransformer(4,array_GCP,0,TRUE);
+    GDALGCPTransform(pTransformArg, FALSE,1,&point[0],&point[1], NULL, panSuccess);
+    CPLFree( panSuccess );
+}
+
+void Texture::get(int countTexture, int dimention)
 {
     OGRRegisterAll();
     OGRDataSource   *poDataset;
-    poDataset = OGRSFDriverRegistrar::Open(filenameMap.toStdString().c_str());
+    poDataset = OGRSFDriverRegistrar::Open(_filenameMap.toStdString().c_str());
     if( poDataset == NULL )
         {
             printf( "Open failed.\n" );
@@ -20,13 +84,13 @@ void Texture::get(QString filenameMap,int count_texture)
     system=poDataset->GetLayerByName("LAYER13");
 
     //Размеры изображения
-    int mat_rows=4096;
-    int mat_cols=4096;
+    int mat_rows=dimention;
+    int mat_cols=dimention;
     vector<Mat> result;
     //Mat mat;
     //mat=Mat::zeros(mat_rows,mat_cols, CV_8UC3);
     //Количество текстур N^2
-    int N=count_texture;
+    int N=countTexture;
     result.resize(N*N);
     for (int k=0;k<N*N;k++)
     {
@@ -40,11 +104,9 @@ void Texture::get(QString filenameMap,int count_texture)
     //счетчик
     uint32_t sc;
 
-    //Получение размеров рамки
-    OGREnvelope env;
-    system->GetExtent(& env);
 
-    int *panSuccess = (int *) CPLCalloc(sizeof(int),1);
+
+    /*int *panSuccess = (int *) CPLCalloc(sizeof(int),1);
 
     GDAL_GCP* array_GCP=new GDAL_GCP[4];
     array_GCP[0].pszId="1";
@@ -77,12 +139,9 @@ void Texture::get(QString filenameMap,int count_texture)
     array_GCP[3].dfGCPLine=rastr_rows-1;
     array_GCP[3].dfGCPX=env.MinX;
     array_GCP[3].dfGCPY=env.MinY;
-    array_GCP[3].dfGCPZ=0;
+    array_GCP[3].dfGCPZ=0;*/
 
-    double X;
-    double Y;
-
-    void *pTransformArg = GDALCreateGCPTransformer(4,array_GCP,0,TRUE);
+    //void *pTransformArg = GDALCreateGCPTransformer(4,array_GCP,0,TRUE);
     int k=0;
 
     OGRFeature *poFeature;
@@ -111,12 +170,14 @@ void Texture::get(QString filenameMap,int count_texture)
                     Point ** pts1=new Point* [numRings1+1];
                     pts1[0]=new Point[ne1];
                     n[0]=ne1;
+                    double point[2];
                     for (int i=0; i<ne1;i++)
                     {
-                        X=ringE1->getX(i);
-                        Y=ringE1->getY(i);
-                        GDALGCPTransform(pTransformArg, FALSE,1 ,&X,&Y, NULL, panSuccess);
-                        pts1[0][i]=Point(X-u*mat_cols,Y-v*mat_rows);
+                        point[0]=ringE1->getX(i);
+                        point[1]=ringE1->getY(i);
+                        transformGCP(point,0,rastr_cols-1,rastr_rows-1,0);
+                        //GDALGCPTransform(pTransformArg, FALSE,1 ,&X,&Y, NULL, panSuccess);
+                        pts1[0][i]=Point(point[0]-u*mat_cols,point[1]-v*mat_rows);
                     }
                     int ni1;
                     OGRLinearRing * ringI1;
@@ -129,10 +190,11 @@ void Texture::get(QString filenameMap,int count_texture)
                       n[i+1]=ni1;
                       for (int j=0; j<ni1;j++)
                        {
-                         X=ringI1->getX(j);
-                         Y=ringI1->getY(j);
-                         GDALGCPTransform(pTransformArg, FALSE,1 ,&X,&Y, NULL, panSuccess);
-                         pts1[i+1][j]=Point(X-u*mat_cols,Y-v*mat_rows);
+                         point[0]=ringI1->getX(j);
+                         point[1]=ringI1->getY(j);
+                         transformGCP(point,0,rastr_cols-1,rastr_rows-1,0);
+                         //GDALGCPTransform(pTransformArg, FALSE,1 ,&X,&Y, NULL, panSuccess);
+                         pts1[i+1][j]=Point(point[0]-u*mat_cols,point[1]-v*mat_rows);
                        }
                      }
                     fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
@@ -142,7 +204,8 @@ void Texture::get(QString filenameMap,int count_texture)
                 //sc++;
                 OGRFeature::DestroyFeature( poFeature );
              }
-            QString filename=filenameMap;
+            QString filename=_filenameMap;
+            filename.append(QString::number(dimention));
             filename.append(QString::number(N));
             filename.append(QString::number(k));
             filename.append(".png");
@@ -152,7 +215,7 @@ void Texture::get(QString filenameMap,int count_texture)
             k++;
             }
     }
-    CPLFree( panSuccess );
+    //CPLFree( panSuccess );
     //cv::imwrite("texture.png",result);
     OGRDataSource::DestroyDataSource( poDataset );
 }
