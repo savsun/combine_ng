@@ -175,6 +175,7 @@ void Texture::get(int countTexture, int dimention)
                     {
                         point[0]=ringE1->getX(i);
                         point[1]=ringE1->getY(i);
+                        //В SXF min,min в левом нижнем углу, а в CV в правом верхнем
                         transformGCP(point,0,rastr_cols-1,rastr_rows-1,0);
                         //GDALGCPTransform(pTransformArg, FALSE,1 ,&X,&Y, NULL, panSuccess);
                         pts1[0][i]=Point(point[0]-u*mat_cols,point[1]-v*mat_rows);

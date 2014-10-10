@@ -9,7 +9,6 @@
 #include <gdal.h>
 
 #include <QXmlDefaultHandler>
-#include <QTest>
 
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -17,6 +16,7 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <glu.h>
 using namespace std;
 using namespace cv;
 #endif // ALL_H

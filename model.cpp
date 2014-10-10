@@ -5,70 +5,71 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     QWidget(parent),
     ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention, this)
 {
+    setWindowModality(Qt::ApplicationModal);
     ui->setupUi(this);
 
-    /*Parser handler;
     QFile fileXml(filenameXml);
     QXmlInputSource source(&fileXml);
     QXmlSimpleReader reader;
     reader.setContentHandler(&handler);
-    reader.parse(source);*/
+    reader.parse(source);
+
+    if(! capture.open(filenameVideo.toStdString()))
+            throw 1;
+    capture.read(frame);
+    countFrame=0;
 
     layout.addWidget(& gl_view);
     setLayout(& layout);
     gl_view.setFocus();
 
-    /*VideoCapture capture;
-    double point[2];
-    if(! capture.open(filenameVideo.toStdString()))
-            throw 1;
-    Mat frame;
-    capture.read(frame);
-    QMap<string,double> frameMap;
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateView()));
+    timer->start(50);
+}
 
-    int k=0;
-    do
+void Model::updateView()
+{
+    QMap<string,double> frameMap;
+    double point[2];
+    GLdouble coord_z;
+    if ((this->isVisible())&&(capture.read(frame)))
     {
-        //cout<<"Frame "<<k+1<<endl;
-        //imshow("frame",frame);
-        frameMap.unite(handler.frames.at(k));
+        imshow("frame",frame);
+        frameMap.unite(handler.frames.at(countFrame));
 
         QMap<string,double>::iterator it=frameMap.begin();
         for (;it != frameMap.end(); ++it)
         {
             //cout<<it.key()<<" "<<it.value()<<endl;
-            if (it.key()=="x") {point[0]=(GLdouble)it.value();}
-            if (it.key()=="y"){point[1]=(GLdouble)it.value();}
-            if (it.key()=="z"){coord_z=(GLdouble)it.value();}
-            if (it.key()=="course"){course=(GLdouble)it.value();}
-            if (it.key()=="pitch"){pitch=(GLdouble)it.value();}
-            if (it.key()=="roll"){roll=(GLdouble)it.value();}
+            //В Xml координаты x и у поменяны местами
+            if (it.key()=="x") {point[1]=(GLdouble)it.value();}
+            if (it.key()=="y"){point[0]=(GLdouble)it.value();}
+            if (it.key()=="h"){coord_z=(GLdouble)it.value();}
+            if (it.key()=="course"){gl_view.course=(GLdouble)it.value();}
+            if (it.key()=="pitch"){gl_view.pitch=(GLdouble)it.value();}
+            if (it.key()=="roll"){gl_view.roll=(GLdouble)it.value();}
+            if (it.key()=="aspect_x"){gl_view.aspect_x=(GLdouble)it.value();}
+            if (it.key()=="aspect_y"){gl_view.aspect_y=(GLdouble)it.value();}
         }
-        cout<<"Точки"<<point[0]<<" "<<point[1]<<endl;
-        cout<<texture_map.env.MinX<<" "<<texture_map.env.MinY<<endl;
-        int minXPixel=-1;
-        int maxXPixel=-1;
-        int minYPixel=1;
-        int maxYPixel=1;
-        float ax=(maxXPixel-minXPixel)/(texture_map.env.MaxX-texture_map.env.MinX);
-        float bx=minXPixel-ax*texture_map.env.MinX;
-        float ay=(maxYPixel-minYPixel)/(texture_map.env.MaxY-texture_map.env.MinY);
-        float by=minYPixel-ay*texture_map.env.MinY;
-        coord_x=ax*point[0]+bx;
-        coord_y=ay*point[1]+by;
+        GLdouble maxH=74688;
+        GLdouble minH=0;
+        GLdouble zmax=1;
+        GLdouble zmin=-1;
+        GLdouble ah=(zmax-zmin)/(maxH-minH);
+        GLdouble bh=zmin-minH*ah;
 
-        gl_view.paintGL();
-        //texture_map.transformGCP(point,0,0,100,100);
-        //coord_x=point[0];
-        //coord_y=point[1];
-        cout<<point[0]<<" "<<point[1]<<endl;
+        gl_view.coord_z=ah*(coord_z+200)+bh;
+        cout<<gl_view.coord_z<<endl;
+        gl_view.texture_map.transformGCP(point,-1,-1,1,1);
+        gl_view.coord_x=point[0];
+        gl_view.coord_y=point[1];
         frameMap.clear();
-        k++;
-        QTest::qWait(120);
+        countFrame++;
+        gl_view.repaint();
+        capture.release();
     }
-    while (capture.read(frame));*/
 }
-
 Model::~Model()
 {
     delete ui;

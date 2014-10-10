@@ -36,28 +36,25 @@ void QMapView::initializeGL()
     glEnable(GL_TEXTURE_2D);  // установить режим двумерных текстур
     glEnable(GL_DEPTH_TEST); // устанавливает режим проверки глубины пикселей
     genTextures();
-    //glShadeModel(GL_FLAT);//отключение сглаживания цветов по умолчанию
     m_nMap=createMap();
-
 }
 
 void QMapView::resizeGL(int nWidth, int nHeight)
 {
     glViewport(0,0,(GLint)nWidth, (GLint)nHeight);//размеры окна
-    glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
-    glLoadIdentity();//присваивает матрице проектирования единичную матрицу
-    glFrustum(-0.01,0.01,-0.01,0.01,0.01,50.0);//задает пространство видимости
+    //glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
+    //glLoadIdentity();//присваивает матрице проектирования единичную матрицу
+    //gluPerspective(aspect_x,aspect_x/aspect_y,0, 2500000);
+    //glFrustum(-0.01,0.01,-0.01,0.01,0.01,50.0);//задает пространство видимости
 }
 
 void QMapView::paintGL()
 {
-    //pitch=parPitch;
-    //roll=parRoll;
-    //course=parCourse;
-    //coord_x=parCoord_x;
-    //coord_y=parCoord_y;
-    //coord_z=parCoord_z;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);//очистить буфер изображения
+    glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
+    glLoadIdentity();//присваивает матрице проектирования единичную матрицу
+    glOrtho(-1,1,-1,1,-1,1);
+    gluPerspective(aspect_x,aspect_x/aspect_y,0, 2500000);
 
     glMatrixMode(GL_MODELVIEW);//текущая матрица моделирования
     glLoadIdentity();
@@ -65,65 +62,14 @@ void QMapView::paintGL()
 
     //glRotatef(m_xRotate,1.0,0.0,0.0);
     //glRotatef(m_yRotate,0.0,1.0,0.0);
+    //glFrustum(-0.01,0.01,-0.01,0.01,0.01,50.0);//задает пространство видимости
 
-
-    VideoCapture capture;
-    double point[2];
-    if(! capture.open(filenameVideo.toStdString()))
-            throw 1;
-    Mat frame;
-    capture.read(frame);
-    QMap<string,double> frameMap;
-
-    int k=0;
-    do
-    {
-        //cout<<"Frame "<<k+1<<endl;
-        //imshow("frame",frame);
-        frameMap.unite(handler.frames.at(k));
-
-        QMap<string,double>::iterator it=frameMap.begin();
-        for (;it != frameMap.end(); ++it)
-        {
-            //cout<<it.key()<<" "<<it.value()<<endl;
-            if (it.key()=="x") {point[1]=(GLdouble)it.value();}
-            if (it.key()=="y"){point[0]=(GLdouble)it.value();}
-            if (it.key()=="z"){coord_z=(GLdouble)it.value();}
-            if (it.key()=="course"){course=(GLdouble)it.value();}
-            if (it.key()=="pitch"){pitch=(GLdouble)it.value();}
-            if (it.key()=="roll"){roll=(GLdouble)it.value();}
-        }
-        cout<<"Точки"<<point[0]<<" "<<point[1]<<endl;
-        //cout<<texture_map.env.MinX<<" "<<texture_map.env.MinY<<endl;
-        /*int minXPixel=-1;
-        int maxXPixel=-1;
-        int minYPixel=1;
-        int maxYPixel=1;
-        float ax=(maxXPixel-minXPixel)/(texture_map.env.MaxX-texture_map.env.MinX);
-        float bx=minXPixel-ax*texture_map.env.MinX;
-        float ay=(maxYPixel-minYPixel)/(texture_map.env.MaxY-texture_map.env.MinY);
-        float by=minYPixel-ay*texture_map.env.MinY;
-        point[0]=ax*point[0]+bx;
-        point[1]=ay*point[1]+by;*/
-        texture_map.transformGCP(point,-1,-1,1,1);
-        coord_x=point[0];
-        coord_y=point[1];
-        cout<<point[0]<<" "<<point[1]<<endl;
-        frameMap.clear();
-        k++;
-        QTest::qWait(120);
-        break;
-    }
-    while (capture.read(frame));
-
-    glRotated(pitch, 1, 0, 0);
+    glRotated(pitch -90, 1, 0, 0);
     glRotated(roll, 0, 1, 0);
     glRotated(course , 0, 0, 1);
     //glRotatef(course +90, 0, 0, 1);// Докрутка на север
 
     glTranslated(-coord_x, - coord_y, - coord_z);
-
-//cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<endl;
     glCallList(m_nMap);
 }
 
@@ -166,6 +112,8 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         PAIR(Qt::Key_R, Qt::Key_F, course, 10);
         PAIR(Qt::Key_T, Qt::Key_G, roll, 10);
         PAIR(Qt::Key_Y, Qt::Key_H, pitch, 10);
+        PAIR(Qt::Key_U, Qt::Key_J, aspect_x, 1);
+        PAIR(Qt::Key_I, Qt::Key_K, aspect_y, 1);
       default:
       QGLWidget::keyPressEvent(keyEvent);
       break;
@@ -232,6 +180,16 @@ GLuint QMapView::createMap()
 
     glNewList(n,GL_COMPILE);
 
+    float maxH=74688;
+    float minH=0;
+    float zmax=1;
+    float zmin=-1;
+    float ah=(zmax-zmin)/(maxH-minH);
+    float bh=zmin-minH*ah;
+    int h=100;
+    float z=ah*h+bh;
+    //float z=-1.3;
+
        float a=-1;
        float b=1;
        int k=0;
@@ -244,16 +202,16 @@ GLuint QMapView::createMap()
             //qglColor(Qt::white);
 
             glTexCoord2f(0.0f, 1.0f);
-            glVertex3f(a,b,-1);
+            glVertex3f(a,b,z);
 
             glTexCoord2f(1.0f, 1.0f);
-            glVertex3f(a+u,b,-1);
+            glVertex3f(a+u,b,z);
 
             glTexCoord2f(1.0f, 0.0f);
-            glVertex3f(a+u,b-u,-1);
+            glVertex3f(a+u,b-u,z);
 
             glTexCoord2f(0.0f, 0.0f);
-            glVertex3f(a,b-u,-1);
+            glVertex3f(a,b-u,z);
 
             glEnd();
 

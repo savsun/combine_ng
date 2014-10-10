@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl xml testlib
+QT       += core gui opengl xml
 CONFIG += c++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,6 +26,8 @@ HEADERS  += mainwindow.h \
     model.h \
     parser.h
 
+INCLUDEPATH += "/usr/include/GL"
 FORMS    += mainwindow.ui \
     model.ui
 LIBS+= -lgdal -lopencv_core -lopencv_imgproc -lopencv_highgui
+LIBS += -lGLU

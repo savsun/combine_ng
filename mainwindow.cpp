@@ -40,6 +40,8 @@ void MainWindow::LoadXml()
 
 void MainWindow::Run()
 {
+    //ui->buttonRun->setEnabled(false);
+    //ui->buttonLoadMap->setEnabled(false);
     countTexture=ui->editCountTexture->text().toInt();
     dimention=ui->editDimentionTexture->text().toInt();
     filenameMap=ui->editLoadMap->text();
