@@ -13,8 +13,7 @@ Texture::Texture(QString filenameMap)
             exit( 1 );
         }
 
-    OGRLayer * system;
-    system=poDataset->GetLayerByName("LAYER13");
+    system=poDataset->GetLayerByName("SYSTEM");
     //Получение размеров рамки
     system->GetExtent(& env);
     OGRDataSource::DestroyDataSource( poDataset );
@@ -79,9 +78,7 @@ void Texture::get(int countTexture, int dimention)
         }
 
     OGRLayer * water;
-    OGRLayer * system;
-    water=poDataset->GetLayerByName("LAYER4");
-    system=poDataset->GetLayerByName("LAYER13");
+    water=poDataset->GetLayerByName("water");
 
     //Размеры изображения
     int mat_rows=dimention;
@@ -145,9 +142,9 @@ void Texture::get(int countTexture, int dimention)
     int k=0;
 
     OGRFeature *poFeature;
-    for (int v=0;v<N;v++)
+    for (int u=0;u<N;u++)
     {
-     for(int u=0;u<N;u++)
+     for(int v=0;v<N;v++)
      {
          water->ResetReading();
          sc=1;
@@ -198,6 +195,7 @@ void Texture::get(int countTexture, int dimention)
                          pts1[i+1][j]=Point(point[0]-u*mat_cols,point[1]-v*mat_rows);
                        }
                      }
+                    //fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar::all(255),8,0,Point());
                     fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
                 }
                 sc+=0xFFFFFF/3000;

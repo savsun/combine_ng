@@ -8,6 +8,8 @@
 #include <QFileDialog>
 #include <QWidget>
 #include <QTimer>
+#include <kohonen.h>
+#include <kmeans.h>
 
 namespace Ui {
 class Model;
@@ -25,7 +27,7 @@ class Model : public QWidget
 public slots:
     void updateView();
 public:
-    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,QWidget *parent = 0);
+    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,bool cash,QWidget *parent = 0);
     ~Model();
 
 private:

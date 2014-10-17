@@ -1,6 +1,8 @@
 #ifndef ALL_H
 #define ALL_H
 
+#include <fmll/fmll.h>
+
 #include <ogrsf_frmts.h>
 #include <ogr_spatialref.h>
 

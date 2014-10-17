@@ -47,6 +47,7 @@ void MainWindow::Run()
     filenameMap=ui->editLoadMap->text();
     filenameVideo=ui->editLoadVideo->text();
     filenameXml=ui->editLoadXml->text();
-    Model* model = new Model(filenameMap,filenameVideo,filenameXml,countTexture,dimention);
+    bool cash=ui->checkBoxCash->isChecked();
+    Model* model = new Model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash);
     model->show();
 }

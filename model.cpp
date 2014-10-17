@@ -1,9 +1,9 @@
 #include "model.h"
 #include "ui_model.h"
 
-Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, int countTexture, int dimention, QWidget *parent) :
+Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, int countTexture, int dimention, bool cash, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention, this)
+    ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cash, this)
 {
     setWindowModality(Qt::ApplicationModal);
     ui->setupUi(this);
@@ -25,7 +25,7 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateView()));
-    timer->start(50);
+    timer->start(4000);
 }
 
 void Model::updateView()
@@ -35,7 +35,10 @@ void Model::updateView()
     GLdouble coord_z;
     if ((this->isVisible())&&(capture.read(frame)))
     {
-        imshow("frame",frame);
+        //Kohonen kohonen;
+        //Mat frame_kohonen=kohonen.getFrame(frame);
+        //imshow( "kohonen", frame_kohonen );
+
         frameMap.unite(handler.frames.at(countFrame));
 
         QMap<string,double>::iterator it=frameMap.begin();
@@ -60,13 +63,19 @@ void Model::updateView()
         GLdouble bh=zmin-minH*ah;
 
         gl_view.coord_z=ah*(coord_z+200)+bh;
-        cout<<gl_view.coord_z<<endl;
+        //cout<<gl_view.coord_z<<endl;
         gl_view.texture_map.transformGCP(point,-1,-1,1,1);
         gl_view.coord_x=point[0];
         gl_view.coord_y=point[1];
         frameMap.clear();
         countFrame++;
+        //imshow("frame",frame);
+        //gl_view.paintGL();
         gl_view.repaint();
+
+        //Kmeans kmeans;
+        //Mat frame_kmeans=kmeans.getFrame(frame);
+        //imshow( "kmeans", frame_kmeans );
         capture.release();
     }
 }

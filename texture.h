@@ -6,8 +6,9 @@ class Texture
 {
      //OGREnvelope env;
      QString _filenameMap;
+     OGRLayer * system;
 public:
-     OGREnvelope env;
+    OGREnvelope env;
     Texture(QString filenameMap);
     void get( int countTexture, int dimention);
     void transformGCP(double point[2], int minXPixel, int minYPixel, int maxXPixel, int maxYPixel);

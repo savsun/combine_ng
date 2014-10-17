@@ -1,6 +1,6 @@
 #include "qmapview.h"
 
-QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, QWidget *parent) :
+QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cash, QWidget *parent) :
     texture_map(_filenameMap),QGLWidget(parent),pitch(0),roll(0),course(0), coord_x(0),coord_y(0),coord_z(0.1)
 {
     filenameMap=_filenameMap;
@@ -8,6 +8,7 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     filenameXml=_filenameXml;
     countTexture=_countTexture;
     dimention=_dimention;
+    cash=_cash;
 }
 #define PAIR(top, bottom, param, step)\
     case top:\
@@ -42,9 +43,10 @@ void QMapView::initializeGL()
 void QMapView::resizeGL(int nWidth, int nHeight)
 {
     glViewport(0,0,(GLint)nWidth, (GLint)nHeight);//размеры окна
-    //glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
-    //glLoadIdentity();//присваивает матрице проектирования единичную матрицу
-    //gluPerspective(aspect_x,aspect_x/aspect_y,0, 2500000);
+    glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
+    glLoadIdentity();//присваивает матрице проектирования единичную матрицу
+    glOrtho(-1,1,-1,1,-1,1);
+    gluPerspective(aspect_x,aspect_x/aspect_y,0, 2500000);
     //glFrustum(-0.01,0.01,-0.01,0.01,0.01,50.0);//задает пространство видимости
 }
 
@@ -64,11 +66,11 @@ void QMapView::paintGL()
     //glRotatef(m_yRotate,0.0,1.0,0.0);
     //glFrustum(-0.01,0.01,-0.01,0.01,0.01,50.0);//задает пространство видимости
 
-    glRotated(pitch -90, 1, 0, 0);
-    glRotated(roll, 0, 1, 0);
-    glRotated(course , 0, 0, 1);
+    glRotated(-pitch-90, 1, 0, 0);
+    glRotated(-roll, 0, 1, 0);
+    glRotated(course, 0, 0, 1);
     //glRotatef(course +90, 0, 0, 1);// Докрутка на север
-
+    cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
 }
@@ -109,11 +111,11 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);
         PAIR(Qt::Key_W, Qt::Key_S, coord_y, 0.01);
         PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.01);
-        PAIR(Qt::Key_R, Qt::Key_F, course, 10);
-        PAIR(Qt::Key_T, Qt::Key_G, roll, 10);
-        PAIR(Qt::Key_Y, Qt::Key_H, pitch, 10);
-        PAIR(Qt::Key_U, Qt::Key_J, aspect_x, 1);
-        PAIR(Qt::Key_I, Qt::Key_K, aspect_y, 1);
+        PAIR(Qt::Key_R, Qt::Key_F, course, 1);
+        PAIR(Qt::Key_T, Qt::Key_G, roll, 1);
+        PAIR(Qt::Key_Y, Qt::Key_H, pitch, 1);
+        PAIR(Qt::Key_U, Qt::Key_J, aspect_x, 0.1);
+        PAIR(Qt::Key_I, Qt::Key_K, aspect_y, 0.1);
       default:
       QGLWidget::keyPressEvent(keyEvent);
       break;
@@ -149,8 +151,9 @@ void QMapView::genTextures()
         filenameImage.append(QString::number(i));
         filenameImage.append(".png");
         fileImage.setFileName(filenameImage);
-        if (! fileImage.exists())
+        if ((! fileImage.exists())||cash)
         {
+            cash=false;
             cout<<"Пересчет текстуры"<<endl;
             texture_map.get(countTexture,dimention);
         }
@@ -179,16 +182,15 @@ GLuint QMapView::createMap()
     GLuint n = glGenLists(1);
 
     glNewList(n,GL_COMPILE);
-
-    float maxH=74688;
+    /*float maxH=74688;
     float minH=0;
     float zmax=1;
     float zmin=-1;
     float ah=(zmax-zmin)/(maxH-minH);
     float bh=zmin-minH*ah;
-    int h=100;
-    float z=ah*h+bh;
-    //float z=-1.3;
+    int h=130;
+    float z=ah*h+bh;*/
+    float z=-1;
 
        float a=-1;
        float b=1;
@@ -204,27 +206,27 @@ GLuint QMapView::createMap()
             glTexCoord2f(0.0f, 1.0f);
             glVertex3f(a,b,z);
 
-            glTexCoord2f(1.0f, 1.0f);
-            glVertex3f(a+u,b,z);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3f(a,b-u,z);
 
             glTexCoord2f(1.0f, 0.0f);
             glVertex3f(a+u,b-u,z);
 
-            glTexCoord2f(0.0f, 0.0f);
-            glVertex3f(a,b-u,z);
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3f(a+u,b,z);
 
             glEnd();
 
            if(k<countTexture-1)
             {
                 k++;
-                a+=u;
+                b-=u;
             }
             else
             {
                 k=0;
-                a=-1;
-                b-=u;
+                b=1;
+                a+=u;
             }
           }
 
