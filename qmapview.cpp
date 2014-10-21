@@ -70,7 +70,7 @@ void QMapView::paintGL()
     glRotated(-roll, 0, 1, 0);
     glRotated(course, 0, 0, 1);
     //glRotatef(course +90, 0, 0, 1);// Докрутка на север
-    cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
+    //cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
 }
@@ -104,8 +104,9 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         imshow("result",result);
         delete buf[];*/
         QImage image=renderPixmap().toImage();
-        Mat result1(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
-        imshow("result1",result1);
+        Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
+
+        imshow("result1",perspective);
         break;
     }
         PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);

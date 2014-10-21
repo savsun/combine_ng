@@ -99,7 +99,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>/home/alexandra/N3716.mp4</string>
+     <string>/home/alexandra/fly084.avi</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonLoadVideo">
@@ -151,7 +151,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>/home/alexandra/N3716.xml</string>
+     <string>/home/alexandra/FLY084.xml</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonLoadXml">

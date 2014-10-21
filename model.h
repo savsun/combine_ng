@@ -24,12 +24,15 @@ class Model : public QWidget
     VideoCapture capture;
     int countFrame;
     Mat frame;
+    Mat marks;
+    void separation (unsigned cls, vector<Point> obj, Mat img, Mat marks, int x, int y);
 public slots:
     void updateView();
 public:
-    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,bool cash,QWidget *parent = 0);
+    vector<vector<Point> > collectionClusters;
+    void getClusters(Mat frame);
+    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,bool cache,QWidget *parent = 0);
     ~Model();
-
 private:
     Ui::Model *ui;
 };

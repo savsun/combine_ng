@@ -15,7 +15,6 @@ Mat  Kmeans::getFrame(Mat parFrame)
         Mat img3xN(n,3,CV_8U);
         vector<Mat> imgRGB;
 
-
               split(parFrame,imgRGB);
               for(int p=0;p!=3;++p)
                  imgRGB[p].reshape(1,n).copyTo(img3xN.col(p));

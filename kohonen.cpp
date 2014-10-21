@@ -51,6 +51,7 @@ Mat  Kohonen::getFrame(Mat parFrame)
                 for(u = 0; u < parFrame.cols; u++, q++)
                 {
                    index_winner = fmll_som_run(som, vec[q]);
+                   collection_clusters[index_winner].push_back(Point(v,u));
                    int color=A*index_winner;
                    pixel[0]=0x0000FF&color;
                    pixel[1]=(0x00FF00&color)>>8;
@@ -58,7 +59,6 @@ Mat  Kohonen::getFrame(Mat parFrame)
                    //pixel[0] = som->w[index_winner][0];
                    //pixel[1] = som->w[index_winner][1];
                    //pixel[2] = som->w[index_winner][2];
-
                    resultFrame.at<Vec3b>(v,u)=pixel;
                 }
             fmll_free(vec);

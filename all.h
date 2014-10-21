@@ -14,11 +14,12 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 #include <glu.h>
+#include <memory>
 using namespace std;
 using namespace cv;
 #endif // ALL_H
