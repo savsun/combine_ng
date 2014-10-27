@@ -20,17 +20,6 @@ Mat  Kohonen::getFrame(Mat parFrame)
     A=0xFFFFFF/A;
 
     fmll_som * som;
-    fmll_random * rnd;
-    double param[2];
-    param[0] = 0;
-    param[1] = 256;
-    //инициализация датчика случайных чисел
-    rnd = fmll_random_init(FMLL_RANDOM_ALGORITHM_LCG, FMLL_RANDOM_DISTRIBUTION_UNIFORM, param, time(NULL));
-    //иницилизация нейронной карты
-    som = fmll_som_init(N, map_dim, 3, & fmll_distance_euclid, & fmll_distance_euclid);//(1)расстояние между векторами, 2)расстояние между нейронами.(2)не исп.,т.к. алгоритм WTA)
-    //иницилизация весов синапсов нейронов карты случайными числами
-    fmll_som_weight_init_random(som, rnd);
-
     Mat resultFrame;
     resultFrame.create(parFrame.rows, parFrame.cols,CV_8UC3);
     Mat frameFromUnsigned;
@@ -40,31 +29,40 @@ Mat  Kohonen::getFrame(Mat parFrame)
     double ** vec;
     //инициализация векторного пространства значениями яркости изображения
     vec = (double **) fmll_alloc(sizeof(double), 2, parFrame.rows * parFrame.cols, 3);
+    som = fmll_som_load(somFilename.c_str(),& fmll_distance_euclid, & fmll_distance_euclid);
 
     //загрузка карты из xml
-    if (fmll_som_load("/home/alexandra/trash/som",& fmll_distance_euclid, & fmll_distance_euclid)!=NULL)
+    if(som == NULL)
     {
-        som=fmll_som_load("som",& fmll_distance_euclid, & fmll_distance_euclid);
-    }
-    else
-    {
+        fmll_random * rnd;
+        double param[2];
+        param[0] = 0;
+        param[1] = 0.01;
+        //инициализация датчика случайных чисел
+        rnd = fmll_random_init(FMLL_RANDOM_ALGORITHM_LCG, FMLL_RANDOM_DISTRIBUTION_UNIFORM, param, time(NULL));
+        //иницилизация нейронной карты
+        som = fmll_som_init(N, map_dim, 3, & fmll_distance_euclid, & fmll_distance_euclid);//(1)расстояние между векторами, 2)расстояние между нейронами.(2)не исп.,т.к. алгоритм WTA)
+        //иницилизация весов синапсов нейронов карты случайными числами
+        fmll_som_weight_init_random(som, rnd);
+
         cout<<"don't load"<<endl;
             for(v = 0, q = 0; v < parFrame.rows; v++)
             for(u = 0; u < parFrame.cols; u++, q++)
             {
                 pixel=parFrame.at<Vec3b>(v,u);
 
-                vec[q][0] = pixel[0];
-                vec[q][1] = pixel[1];
-                vec[q][2] = pixel[2];
+                vec[q][0] = pixel[0] / 255.;
+                vec[q][1] = pixel[1] / 255.;
+                vec[q][2] = pixel[2] / 255.;
             }
             //обучение нейронной карты
             fmll_som_so_kohonen(som, (const double **) vec, parFrame.rows * parFrame.cols,
                                         0.3, & fmll_timing_next_beta_step_plus_0_1, 0.8, 0.002, & fmll_som_neighbor_wta);
-            if (fmll_som_save(som,"/home/alexandra/trash/som")!=0)
+            if (fmll_som_save(som,somFilename.c_str())!=0)
             {
                 cout<<"Ошибка сохранения Som в Xml"<<endl;
             }
+            fmll_random_destroy(rnd);
    }
             for(v = 0, q = 0; v < parFrame.rows; v++)
             {
@@ -85,8 +83,7 @@ Mat  Kohonen::getFrame(Mat parFrame)
                 //cout<<endl;
              }
             fmll_free(vec);
-    //imshow( "kohonen", resultFrame );
+    imshow( "kohonen", resultFrame );
     fmll_som_destroy(som);
-    fmll_random_destroy(rnd);
     return frameFromUnsigned;
 }

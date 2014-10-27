@@ -8,7 +8,6 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     setWindowModality(Qt::ApplicationModal);
     ui->setupUi(this);
 
-
     QFile fileXml(filenameXml);
     QXmlInputSource source(&fileXml);
     QXmlSimpleReader reader;
@@ -18,17 +17,17 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     if(! capture.open(filenameVideo.toStdString()))
             throw 1;
     capture.read(frame);
-    countFrame=50000;
+    countFrame=1;
 
     layout.addWidget(& gl_view);
     setLayout(& layout);
     gl_view.setFocus();
 
-    //connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
+    connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateView()));
-    timer->start(4000);
+    timer->start(40);
 }
 //x-столбцы, y-строки
 void Model::separation(unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y)
@@ -127,6 +126,17 @@ void Model::classification(vector<vector<Point> > collectionClusters, Mat perspe
 
 void Model::doClassification()
 {
+    Kohonen kohonen;
+    Mat frame_kohonen=kohonen.getFrame(frame);
+    cout<<"Кохонен завершен"<<endl;
+    //imshow( "kohonen", frame_kohonen);
+
+    //Kmeans kmeans;
+    //Mat frame_kmeans=kmeans.getFrame(frame);
+    //imshow( "kmeans", frame_kmeans );
+
+    /*getClusters(frame_kohonen);
+    cout<<"Разделение на кластеры окончено"<<endl;
     cout<<"1"<<endl;
     QImage image=gl_view.renderPixmap().toImage();
     cout<<"2"<<endl;
@@ -134,29 +144,17 @@ void Model::doClassification()
     //classification(collectionClusters,perspective,50);
     classification(collectionClusters,Mat::zeros(frame.rows,frame.cols,CV_32SC1),50);
     cout<<"Классификация закончена"<<endl;
-    collectionClusters.clear();
+    collectionClusters.clear();*/
 }
-
+bool toDo=true;
 void Model::updateView()
 {
     QMap<string,double> frameMap;
     double point[2];
     GLdouble coord_z;
-    if ((this->isVisible())&&(capture.read(frame)))
-    {
-        //Kohonen kohonen;
-        //Mat frame_kohonen=kohonen.getFrame(frame);
-        //cout<<"Кохонен завершен"<<endl;
-        //imshow( "kohonen", frame_kohonen );
-
-        //Kmeans kmeans;
-        //Mat frame_kmeans=kmeans.getFrame(frame);
-        //imshow( "kmeans", frame_kmeans );
-
-        //getClusters(frame_kohonen);
-        //cout<<"Разделение на кластеры окончено"<<endl;
+    if ((this->isVisible())&&(capture.read(frame))&&toDo)
+    {      
         frameMap.unite(handler.frames.at(countFrame));
-
         QMap<string,double>::iterator it=frameMap.begin();
         for (;it != frameMap.end(); ++it)
         {
@@ -185,11 +183,12 @@ void Model::updateView()
         gl_view.coord_y=point[1];
         frameMap.clear();
         countFrame++;
+
         imshow("frame",frame);
         //gl_view.paintGL();
 
         gl_view.repaint();
-        capture.release();
+        toDo=false;
     }
 }
 Model::~Model()

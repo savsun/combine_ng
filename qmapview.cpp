@@ -102,11 +102,7 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         }
         imshow("result",result);
         delete buf[];*/
-        QImage image=renderPixmap().toImage();
-
-        Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
-
-        imshow("result1",perspective);
+        doClassification();
         break;
     }
         PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);
@@ -143,7 +139,6 @@ void QMapView::genTextures()
     QImage image[countTexture*countTexture];
     glGenTextures(countTexture*countTexture, textureID);
 
-
     for (int i=0; i<countTexture*countTexture;i++)
     {
         QString filenameImage=filenameMap;
@@ -175,7 +170,6 @@ void QMapView::genTextures()
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,(GLsizei)image[i].width(),(GLsizei)image[i].height(),0,
                      GL_RGBA, GL_UNSIGNED_BYTE, image[i].bits());
     }
-
 }
 
 GLuint QMapView::createMap()
