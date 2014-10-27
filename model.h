@@ -25,9 +25,13 @@ class Model : public QWidget
     int countFrame;
     Mat frame;
     Mat marks;
-    void separation (unsigned cls, vector<Point> obj, Mat img, Mat marks, int x, int y);
+    vector<unsigned> nonclassifier;
+    vector<pair<uint32_t,unsigned>> classifier;
+    void separation (unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y);
+    void classification(vector<vector<Point> > collectionClusters, Mat perspective, int T);
 public slots:
     void updateView();
+    void doClassification();
 public:
     vector<vector<Point> > collectionClusters;
     void getClusters(Mat frame);

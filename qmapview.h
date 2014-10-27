@@ -17,7 +17,7 @@ private:
     GLuint m_nMap;
     //GLfloat m_xRotate;//поворот по х
     //GLfloat m_yRotate;//поворот по у
-    bool cash;
+    bool cache;
     int countTexture;
     QString filenameMap;
     QString filenameVideo;
@@ -47,9 +47,10 @@ public:
     GLdouble coord_z;
     GLdouble aspect_x;
     GLdouble aspect_y;
-    explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cash,QWidget *parent = 0);
+    explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache,QWidget *parent = 0);
 
 signals:
+    void doClassification();
 
 public slots:
 

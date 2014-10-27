@@ -1,6 +1,6 @@
 #include "qmapview.h"
 
-QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cash, QWidget *parent) :
+QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache, QWidget *parent) :
     texture_map(_filenameMap),QGLWidget(parent),pitch(0),roll(0),course(0), coord_x(0),coord_y(0),coord_z(0.1)
 {
     filenameMap=_filenameMap;
@@ -8,7 +8,7 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     filenameXml=_filenameXml;
     countTexture=_countTexture;
     dimention=_dimention;
-    cash=_cash;
+    cache=_cache;
 }
 #define PAIR(top, bottom, param, step)\
     case top:\
@@ -69,11 +69,10 @@ void QMapView::paintGL()
     glRotated(-pitch-90, 1, 0, 0);
     glRotated(-roll, 0, 1, 0);
     glRotated(course, 0, 0, 1);
-    //glRotatef(course +90, 0, 0, 1);// Докрутка на север
     //cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
-}
+    }
 
 void QMapView::keyPressEvent(QKeyEvent* keyEvent)
 {
@@ -104,6 +103,7 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         imshow("result",result);
         delete buf[];*/
         QImage image=renderPixmap().toImage();
+
         Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
 
         imshow("result1",perspective);
@@ -152,9 +152,9 @@ void QMapView::genTextures()
         filenameImage.append(QString::number(i));
         filenameImage.append(".png");
         fileImage.setFileName(filenameImage);
-        if ((! fileImage.exists())||cash)
+        if ((! fileImage.exists())||cache)
         {
-            cash=false;
+            cache=false;
             cout<<"Пересчет текстуры"<<endl;
             texture_map.get(countTexture,dimention);
         }

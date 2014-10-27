@@ -8,9 +8,10 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     setWindowModality(Qt::ApplicationModal);
     ui->setupUi(this);
 
+
     QFile fileXml(filenameXml);
     QXmlInputSource source(&fileXml);
-    QXmlSimpleReader reader;\
+    QXmlSimpleReader reader;
     reader.setContentHandler(&handler);
     reader.parse(source);
 
@@ -23,40 +24,117 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     setLayout(& layout);
     gl_view.setFocus();
 
+    //connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
+
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateView()));
     timer->start(4000);
 }
-
-void Model::separation(unsigned cls, vector<Point> obj, Mat img, Mat marks, int x, int y)
+//x-столбцы, y-строки
+void Model::separation(unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y)
 {
-    if ((marks.at<unsigned>(x,y)==0)&&((obj.size()==0) || (img.at<unsigned>(x,y)=cls)))
+    if ((marks.at<unsigned>(y,x)==0)&&((obj.size()==0) || (img.at<unsigned>(y,x)==cls)))
     {
      obj.push_back(Point(x,y));
-     cls=img.at<unsigned>(x,y);
-     marks.at<unsigned>(x,y)=1;
-     for(int i=x-1; i<=x+1; i++)
-        for (int j=y-1; j<=y+1; j++)
-     {
-         separation(cls,obj,img,marks,i,j);
-     }
+     cls=img.at<unsigned>(y,x);
+     marks.at<unsigned>(y,x)=1;
+     int from_x = max(0, x - 1);
+     int from_y = max(0, y - 1);
+     int to_x = min(img.cols/2 - 1, x + 1);
+     int to_y = min(img.rows/2 - 1, y + 1);
+     for(int i=from_x; i<=to_x; i++)
+        for (int j=from_y; j<=to_y; j++)
+        {
+            separation(cls,obj,img,marks,i,j);
+        }
     }
 }
 
 void Model::getClusters(Mat frame)
 {
+    cout<<"Разделение на кластеры"<<endl;
     marks=Mat::zeros(frame.rows,frame.cols,CV_8UC1);
-    for (int u=0;u<frame.rows;u++)
-        for (int v=0;v<frame.cols;v++)
+    for (int u=0;u<frame.rows/2;u++)
+        for (int v=0;v<frame.cols/2;v++)
         {
             if (marks.at<unsigned>(u,v)==0)
             {
-                int cls=frame.at<unsigned>(u,v);
                 vector<Point> cluster;
-                separation(cls,cluster,frame,marks,u,v);
+                separation(0,cluster,frame,marks,v,u);
+                //cout<<"Н";
+                /*for (int i=0;i<cluster.size();i++)
+                {
+                    cout<<cluster[i]<<" ";
+                }*/
                 collectionClusters.push_back(cluster);
             }
         }
+}
+void Model::classification(vector<vector<Point> > collectionClusters, Mat perspective,int T)
+{
+    cout<<"Классификация"<<endl;
+    Mat classificated=Mat::zeros(perspective.rows,perspective.cols, CV_8UC1);
+    uint32_t key;
+    //Для каждого кластера
+    for (int i=0; i<collectionClusters.size();i++)
+    {
+        QMap<uint32_t,int> countPoint;
+        int index=-1;
+
+        for (int j=0; j<collectionClusters.at(i).size();j++)
+        {
+          key=perspective.at<uint32_t>(collectionClusters[i][j].y,collectionClusters[i][j].x);
+          cout<<key<<" ";
+          if (countPoint.contains(key))
+          {
+              countPoint[key]++;
+          }
+          else
+          {
+             countPoint[key]=1;
+          }
+        }
+        int numberPoint=collectionClusters[i].size();
+        QMap<uint32_t,int>::iterator it=countPoint.begin();
+        for (;it != countPoint.end(); ++it)
+        {
+            if (it.value()*100./numberPoint>T)
+            {
+                if (index == -1)
+                {
+                    index = it.key();
+                }
+                else
+                {
+                    index = -1;
+                    break;
+                }
+            }
+        }
+        if (index ==-1)
+        {
+             nonclassifier.push_back(i);
+        }
+        else
+        {
+            classifier.push_back(make_pair(index,i));
+            Point * ptrCluster=collectionClusters[i].data();
+            fillPoly(classificated,(const Point**)&ptrCluster,&numberPoint,1,Scalar::all(255),8,0,Point());
+        }
+    }
+    imshow("classificated",classificated);
+}
+
+void Model::doClassification()
+{
+    cout<<"1"<<endl;
+    QImage image=gl_view.renderPixmap().toImage();
+    cout<<"2"<<endl;
+    Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
+    //classification(collectionClusters,perspective,50);
+    classification(collectionClusters,Mat::zeros(frame.rows,frame.cols,CV_32SC1),50);
+    cout<<"Классификация закончена"<<endl;
+    collectionClusters.clear();
 }
 
 void Model::updateView()
@@ -66,11 +144,17 @@ void Model::updateView()
     GLdouble coord_z;
     if ((this->isVisible())&&(capture.read(frame)))
     {
-        Kohonen kohonen;
-        Mat frame_kohonen=kohonen.getFrame(frame);
-        imshow( "kohonen", frame_kohonen );
-        getClusters(frame_kohonen);
+        //Kohonen kohonen;
+        //Mat frame_kohonen=kohonen.getFrame(frame);
+        //cout<<"Кохонен завершен"<<endl;
+        //imshow( "kohonen", frame_kohonen );
 
+        //Kmeans kmeans;
+        //Mat frame_kmeans=kmeans.getFrame(frame);
+        //imshow( "kmeans", frame_kmeans );
+
+        //getClusters(frame_kohonen);
+        //cout<<"Разделение на кластеры окончено"<<endl;
         frameMap.unite(handler.frames.at(countFrame));
 
         QMap<string,double>::iterator it=frameMap.begin();
@@ -103,12 +187,8 @@ void Model::updateView()
         countFrame++;
         imshow("frame",frame);
         //gl_view.paintGL();
-        gl_view.repaint();
 
-        Kmeans kmeans;
-        Mat frame_kmeans=kmeans.getFrame(frame);
-        imshow( "kmeans", frame_kmeans );
-        collectionClusters.clear();
+        gl_view.repaint();
         capture.release();
     }
 }
@@ -116,5 +196,3 @@ Model::~Model()
 {
     delete ui;
 }
-
-

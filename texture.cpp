@@ -101,44 +101,6 @@ void Texture::get(int countTexture, int dimention)
     //счетчик
     uint32_t sc;
 
-
-
-    /*int *panSuccess = (int *) CPLCalloc(sizeof(int),1);
-
-    GDAL_GCP* array_GCP=new GDAL_GCP[4];
-    array_GCP[0].pszId="1";
-    array_GCP[0].pszInfo="";
-    array_GCP[0].dfGCPPixel=0;
-    array_GCP[0].dfGCPLine=0;
-    array_GCP[0].dfGCPX=env.MinX;
-    array_GCP[0].dfGCPY=env.MaxY;
-    array_GCP[0].dfGCPZ=0;
-
-    array_GCP[1].pszId="2";
-    array_GCP[1].pszInfo="";
-    array_GCP[1].dfGCPPixel=rastr_cols-1;
-    array_GCP[1].dfGCPLine=rastr_rows-1;
-    array_GCP[1].dfGCPX=env.MaxX;
-    array_GCP[1].dfGCPY=env.MinY;
-    array_GCP[1].dfGCPZ=0;
-
-    array_GCP[2].pszId="3";
-    array_GCP[2].pszInfo="";
-    array_GCP[2].dfGCPPixel=rastr_cols-1;
-    array_GCP[2].dfGCPLine=0;
-    array_GCP[2].dfGCPX=env.MaxX;
-    array_GCP[2].dfGCPY=env.MaxY;
-    array_GCP[2].dfGCPZ=0;
-
-    array_GCP[3].pszId="4";
-    array_GCP[3].pszInfo="";
-    array_GCP[3].dfGCPPixel=0;
-    array_GCP[3].dfGCPLine=rastr_rows-1;
-    array_GCP[3].dfGCPX=env.MinX;
-    array_GCP[3].dfGCPY=env.MinY;
-    array_GCP[3].dfGCPZ=0;*/
-
-    //void *pTransformArg = GDALCreateGCPTransformer(4,array_GCP,0,TRUE);
     int k=0;
 
     OGRFeature *poFeature;
@@ -208,13 +170,9 @@ void Texture::get(int countTexture, int dimention)
             filename.append(QString::number(N));
             filename.append(QString::number(k));
             filename.append(".png");
-            //imshow(filename.toStdString(),result[k]);
-            //waitKey();
             imwrite(filename.toStdString(),result[k]);
             k++;
             }
     }
-    //CPLFree( panSuccess );
-    //cv::imwrite("texture.png",result);
     OGRDataSource::DestroyDataSource( poDataset );
 }
