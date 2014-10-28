@@ -30,7 +30,15 @@ Mat  Kohonen::getFrame(Mat parFrame)
     //инициализация векторного пространства значениями яркости изображения
     vec = (double **) fmll_alloc(sizeof(double), 2, parFrame.rows * parFrame.cols, 3);
     som = fmll_som_load(somFilename.c_str(),& fmll_distance_euclid, & fmll_distance_euclid);
+    for(v = 0, q = 0; v < parFrame.rows; v++)
+    for(u = 0; u < parFrame.cols; u++, q++)
+    {
+        pixel=parFrame.at<Vec3b>(v,u);
 
+        vec[q][0] = pixel[0] / 255.;
+        vec[q][1] = pixel[1] / 255.;
+        vec[q][2] = pixel[2] / 255.;
+    }
     //загрузка карты из xml
     if(som == NULL)
     {
@@ -46,15 +54,7 @@ Mat  Kohonen::getFrame(Mat parFrame)
         fmll_som_weight_init_random(som, rnd);
 
         cout<<"don't load"<<endl;
-            for(v = 0, q = 0; v < parFrame.rows; v++)
-            for(u = 0; u < parFrame.cols; u++, q++)
-            {
-                pixel=parFrame.at<Vec3b>(v,u);
 
-                vec[q][0] = pixel[0] / 255.;
-                vec[q][1] = pixel[1] / 255.;
-                vec[q][2] = pixel[2] / 255.;
-            }
             //обучение нейронной карты
             fmll_som_so_kohonen(som, (const double **) vec, parFrame.rows * parFrame.cols,
                                         0.3, & fmll_timing_next_beta_step_plus_0_1, 0.8, 0.002, & fmll_som_neighbor_wta);
@@ -78,9 +78,9 @@ Mat  Kohonen::getFrame(Mat parFrame)
                    //pixel[2] = som->w[index_winner][2];
                    resultFrame.at<Vec3b>(v,u)=pixel;
                    frameFromUnsigned.at<uint32_t>(v,u)=color;
-                   //cout<<frameFromUnsigned.at<unsigned>(v,u)<<" ";
+                   //cout<<color<<" ";
                 }
-                //cout<<endl;
+                 //cout<<endl;
              }
             fmll_free(vec);
     imshow( "kohonen", resultFrame );
