@@ -12,7 +12,7 @@ class QMapView : public QGLWidget
 {
     Q_OBJECT
 private:
-    GLuint* textureID;
+    shared_ptr<GLuint> textureID;
     //GLuint textureID;
     GLuint m_nMap;
     //GLfloat m_xRotate;//поворот по х
@@ -47,6 +47,7 @@ public:
     GLdouble coord_z;
     GLdouble aspect_x;
     GLdouble aspect_y;
+    ~QMapView();
     explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache,QWidget *parent = 0);
 
 signals:

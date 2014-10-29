@@ -50,6 +50,7 @@ void MainWindow::Run()
     filenameVideo=ui->editLoadVideo->text();
     filenameXml=ui->editLoadXml->text();
     bool cash=ui->checkBoxCash->isChecked();
-    Model* model = new Model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash);
-    model->show();
+    Model model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash);
+    model.exec();
+    cout<<"end"<<endl;
 }

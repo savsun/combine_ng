@@ -15,7 +15,7 @@ namespace Ui {
 class Model;
 }
 
-class Model : public QWidget
+class Model : public QDialog
 {
     Q_OBJECT
     QVBoxLayout layout;
@@ -27,6 +27,7 @@ class Model : public QWidget
     Mat marks;
     vector<unsigned> nonclassifier;
     vector<pair<uint32_t,unsigned>> classifier;
+    QTimer timer;
     void separation (unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y);
     void classification(vector<vector<Point> > collectionClusters, Mat perspective, int T);
 public slots:

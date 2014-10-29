@@ -2,10 +2,9 @@
 #include "ui_model.h"
 
 Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, int countTexture, int dimention, bool cache, QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),timer(this),
     ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cache, this)
 {
-    setWindowModality(Qt::ApplicationModal);
     ui->setupUi(this);
 
     QFile fileXml(filenameXml);
@@ -13,11 +12,11 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     QXmlSimpleReader reader;
     reader.setContentHandler(&handler);
     reader.parse(source);
-
     if(! capture.open(filenameVideo.toStdString()))
             throw 1;
+    capture.set(CV_CAP_PROP_POS_FRAMES,3);
     capture.read(frame);
-    countFrame=1;
+    countFrame=3;
 
     layout.addWidget(& gl_view);
     setLayout(& layout);
@@ -25,9 +24,8 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 
     connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateView()));
-    timer->start(40);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(updateView()));
+    timer.start(40);
 }
 //x-столбцы, y-строки
 /*void Model::separation(unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y)
@@ -196,11 +194,13 @@ void Model::doClassification()
 bool toDo=true;
 void Model::updateView()
 {
+    //cout<<capture.get(CV_CAP_PROP_POS_FRAMES)<<endl;
+    cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
     QMap<string,double> frameMap;
     double point[2];
     GLdouble coord_z;
-    if ((this->isVisible())&&(capture.read(frame))&&toDo)
-    {      
+    if (toDo&&(this->isVisible())&&(capture.read(frame)))
+    {
         frameMap.unite(handler.frames.at(countFrame));
         QMap<string,double>::iterator it=frameMap.begin();
         for (;it != frameMap.end(); ++it)

@@ -28,7 +28,7 @@ Texture::Texture(QString filenameMap)
      point[1]=ay*point[1]+by;*/
     //cout<<"minXPixel "<<minXPixel<<"minYPixel "<<minYPixel<<"maxXPixel"<<maxXPixel<<"maxYPixel "<<maxYPixel<<endl;
     int *panSuccess = (int *) CPLCalloc(sizeof(int),1);
-    GDAL_GCP* array_GCP=new GDAL_GCP[4];
+    GDAL_GCP array_GCP[4];
     array_GCP[0].pszId="1";
     array_GCP[0].pszInfo="";
     array_GCP[0].dfGCPPixel=minXPixel;
@@ -125,7 +125,7 @@ void Texture::get(int countTexture, int dimention)
                     //Количество дырок
                     int numRings1=poPolygon->getNumInteriorRings();
 
-                    int* n=new int[numRings1+1];
+                    int n[numRings1+1];
                     Point ** pts1=new Point* [numRings1+1];
                     pts1[0]=new Point[ne1];
                     n[0]=ne1;
@@ -159,6 +159,12 @@ void Texture::get(int countTexture, int dimention)
                      }
                     //fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar::all(255),8,0,Point());
                     fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
+
+                    for (int i=0;i<numRings1;i++)
+                    {
+                        delete[] pts1[i];
+                    }
+                    delete pts1;
                 }
                 sc+=0xFFFFFF/3000;
 

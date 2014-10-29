@@ -135,9 +135,9 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
 void QMapView::genTextures()
 {
     QFile fileImage;
-    textureID=new GLuint[countTexture*countTexture];
+    textureID.reset(new GLuint[countTexture*countTexture],std::default_delete<GLuint[]>());
     QImage image[countTexture*countTexture];
-    glGenTextures(countTexture*countTexture, textureID);
+    glGenTextures(countTexture*countTexture, textureID.get());
 
     for (int i=0; i<countTexture*countTexture;i++)
     {
@@ -155,7 +155,7 @@ void QMapView::genTextures()
         }
         image[i].load(fileImage.fileName());
         image[i]=QGLWidget::convertToGLFormat(image[i]);
-        glBindTexture(GL_TEXTURE_2D, textureID[i]);
+        glBindTexture(GL_TEXTURE_2D, textureID.get()[i]);
         // дополнительные параметры текстурного объекта
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // задана линейная фильтрация вблизи
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // задана линейная фильтрация вдали
@@ -171,7 +171,11 @@ void QMapView::genTextures()
                      GL_RGBA, GL_UNSIGNED_BYTE, image[i].bits());
     }
 }
-
+QMapView::~QMapView()
+{
+    glDeleteLists(m_nMap,1);
+    glDeleteTextures(countTexture*countTexture,textureID.get());
+}
 GLuint QMapView::createMap()
 {
     GLuint n = glGenLists(1);
@@ -194,7 +198,7 @@ GLuint QMapView::createMap()
        for (int i=0; i<countTexture*countTexture;i++)
         {
 
-            glBindTexture(GL_TEXTURE_2D, textureID[i]);
+            glBindTexture(GL_TEXTURE_2D, textureID.get()[i]);
             glBegin(GL_QUADS);//четырехугольник
             //qglColor(Qt::white);
 
