@@ -23,21 +23,21 @@ void MainWindow::LoadMap()
 {
     filenameMap=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать карту.."),".", trUtf8("Векторная карта (*.sxf)"));
     ui->editLoadMap->setText(filenameMap);
-    //ui->buttonRun->setEnabled(! filenameMap.toStdString().empty());
+    ui->buttonRun->setEnabled(! filenameMap.toStdString().empty());
 }
 //Обработка кнопки "Обзор" для видео
 void MainWindow::LoadVideo()
 {
     filenameVideo=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать видео.."),".", trUtf8("Видео (*.avi *.mp4)"));
     ui->editLoadVideo->setText(filenameVideo);
-    //ui->buttonRun->setEnabled(! filenameVideo.toStdString().empty());
+    ui->buttonRun->setEnabled(! filenameVideo.toStdString().empty());
 }
 //Обработка кнопки "Обзор" для Xml
 void MainWindow::LoadXml()
 {
     filenameXml=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать файл метаданных.."),".", trUtf8("XML-файл (*.xml)"));
     ui->editLoadXml->setText(filenameXml);
-    //ui->buttonRun->setEnabled(! filenameXml.toStdString().empty());
+    ui->buttonRun->setEnabled(! filenameXml.toStdString().empty());
 }
 
 void MainWindow::Run()

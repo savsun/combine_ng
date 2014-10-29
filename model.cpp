@@ -5,18 +5,24 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     QDialog(parent),timer(this),
     ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cache, this)
 {
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
     ui->setupUi(this);
 
     QFile fileXml(filenameXml);
     QXmlInputSource source(&fileXml);
     QXmlSimpleReader reader;
     reader.setContentHandler(&handler);
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
     reader.parse(source);
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
     if(! capture.open(filenameVideo.toStdString()))
             throw 1;
-    capture.set(CV_CAP_PROP_POS_FRAMES,3);
+    countFrame=58000;
+    capture.set(CV_CAP_PROP_POS_FRAMES,countFrame);
     capture.read(frame);
-    countFrame=3;
 
     layout.addWidget(& gl_view);
     setLayout(& layout);
@@ -26,6 +32,8 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(updateView()));
     timer.start(40);
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
 }
 //x-столбцы, y-строки
 /*void Model::separation(unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y)
@@ -53,6 +61,8 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 
 void Model::getClusters(Mat frame)
 {
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
     int B=40;
     cout<<"Разделение на кластеры"<<endl;
     uint32_t cls;
@@ -94,6 +104,8 @@ void Model::getClusters(Mat frame)
             }
         }
     cout<<collectionClusters.size()<<endl;
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
 }
 
 /*void Model::getClusters(Mat frame)
@@ -194,13 +206,18 @@ void Model::doClassification()
 bool toDo=true;
 void Model::updateView()
 {
+    printf("Мы здесь (UV): %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
     //cout<<capture.get(CV_CAP_PROP_POS_FRAMES)<<endl;
-    cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
+    //cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
     QMap<string,double> frameMap;
     double point[2];
     GLdouble coord_z;
     if (toDo&&(this->isVisible())&&(capture.read(frame)))
     {
+
+        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+        printf("Time: %d\n", tm.elapsed());
         frameMap.unite(handler.frames.at(countFrame));
         QMap<string,double>::iterator it=frameMap.begin();
         for (;it != frameMap.end(); ++it)
@@ -234,7 +251,12 @@ void Model::updateView()
 
         gl_view.repaint();
         toDo=false;
+        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+        printf("Time: %d\n", tm.elapsed());
     }
+
+    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
+    printf("Time: %d\n", tm.elapsed());
 }
 Model::~Model()
 {

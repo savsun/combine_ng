@@ -23,7 +23,6 @@ private:
     QString filenameVideo;
     QString filenameXml;
     int dimention;
-    Parser handler;
     //QPoint m_ptPosition;//координата указателя мыши в момент нажатия
 
 protected:
