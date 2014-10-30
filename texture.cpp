@@ -104,6 +104,7 @@ void Texture::get(int countTexture, int dimention)
     int k=0;
 
     OGRFeature *poFeature;
+
     for (int u=0;u<N;u++)
     {
      for(int v=0;v<N;v++)
@@ -124,7 +125,6 @@ void Texture::get(int countTexture, int dimention)
                     int ne1=ringE1->getNumPoints();
                     //Количество дырок
                     int numRings1=poPolygon->getNumInteriorRings();
-
                     int n[numRings1+1];
                     Point ** pts1=new Point* [numRings1+1];
                     pts1[0]=new Point[ne1];
@@ -160,12 +160,12 @@ void Texture::get(int countTexture, int dimention)
                     //fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar::all(255),8,0,Point());
                     fillPoly(result[k], (const Point**) pts1,n,numRings1+1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
 
-                    for (int i=0;i<numRings1;i++)
+                    for (int i=0;i<numRings1+1;i++)
                     {
                         delete[] pts1[i];
                     }
-                    delete pts1;
-                }
+                    delete[] pts1;
+                  }
                 sc+=0xFFFFFF/3000;
 
                 //sc++;

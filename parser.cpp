@@ -21,15 +21,11 @@ bool Parser::endElement (const QString&, const QString&, const QString& str)
     if (str=="frame")
     {
         result->Transform(1,&frame["y"],&frame["x"],NULL);
-        // xy=transform();
-        // frame["y"]=xy.get()[0];
-        // frame["x"]=xy.get()[1];
         frames.push_back(frame);
     }
     else // str != frame
     if (str!="amv")
     {
-      //cout<<str.toStdString()<<" "<<strText.toDouble()<<endl;
       frame.insert(str.toStdString(),strText.toDouble());
     }
     return true;

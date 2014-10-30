@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>621</width>
-    <height>323</height>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/amv/disser/data/Полет/maps/N3716/N3716.sxf</string>
+             <string>/home/alexandra/trash/N3716.sxf</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -69,7 +69,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/amv/disser/data/uav/17-14/Полеты_28_09_2014/Левая/3D_R0003.MP4</string>
+             <string>/home/alexandra/trash/3D_R0003.MP4</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -104,7 +104,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/amv/disser/data/uav/17-14/Полеты_28_09_2014/Навигационные данные/alexandra_84.xml</string>
+             <string>/home/alexandra/trash/FLY084.xml</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>

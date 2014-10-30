@@ -4,7 +4,7 @@
 
 class Kohonen
 {
-     const string somFilename="som";
+     const string somFilename="/home/alexandra/trash/som";
 public:
     Kohonen();
     Mat  getFrame(Mat parFrame);
