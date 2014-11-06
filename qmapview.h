@@ -33,6 +33,10 @@ protected:
     GLuint createMap ();
 
 public:
+
+    bool toDo;
+
+    double point[2];
     virtual void initializeGL();
     virtual void resizeGL (int nWidth,int nHeight);
     virtual void paintGL ();

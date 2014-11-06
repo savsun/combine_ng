@@ -65,10 +65,10 @@ void QMapView::paintGL()
     glRotated(-pitch-90, 1, 0, 0);
     glRotated(-roll, 0, 1, 0);
     glRotated(course, 0, 0, 1);
-    //cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
+    cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<course<<" "<<roll<<" "<<pitch<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
-    }
+}
 
 void QMapView::keyPressEvent(QKeyEvent* keyEvent)
 {
@@ -101,9 +101,19 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         doClassification();
         break;
     }
+    case Qt::Key_End:
+    {
+        toDo=false;
+        break;
+    }
+    case Qt::Key_Enter:
+    {
+        toDo=true;
+        break;
+    }
         PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);
         PAIR(Qt::Key_W, Qt::Key_S, coord_y, 0.01);
-        PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.01);
+        PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.0001);
         PAIR(Qt::Key_R, Qt::Key_F, course, 1);
         PAIR(Qt::Key_T, Qt::Key_G, roll, 1);
         PAIR(Qt::Key_Y, Qt::Key_H, pitch, 1);

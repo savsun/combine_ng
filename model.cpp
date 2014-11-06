@@ -5,18 +5,21 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     QDialog(parent),timer(this),
     ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cache, this)
 {
-    ui->setupUi(this);
+    if(! capture.open(filenameVideo.toStdString()))
+            throw 1;
+    countFrame=0;
+    //capture.set(CV_CAP_PROP_POS_MSEC,(countFrame-3152)*10);
+    //cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
 
+    capture.read(frame);
+
+    ui->setupUi(this);
+    setGeometry(0,0,frame.cols+22,frame.rows+22);
     QFile fileXml(filenameXml);
     QXmlInputSource source(&fileXml);
     QXmlSimpleReader reader;
     reader.setContentHandler(&handler);
     reader.parse(source);
-    if(! capture.open(filenameVideo.toStdString()))
-            throw 1;
-    countFrame=58000;
-    capture.set(CV_CAP_PROP_POS_FRAMES,countFrame);
-    capture.read(frame);
 
     layout.addWidget(& gl_view);
     setLayout(& layout);
@@ -172,17 +175,17 @@ void Model::classification(vector<vector<Point> > collectionClusters, Mat perspe
 
 void Model::doClassification()
 {
-    Kohonen kohonen;
-    Mat frame_kohonen=kohonen.getFrame(frame);
-    cout<<"Кохонен завершен"<<endl;
+    //Kohonen kohonen;
+    //Mat frame_kohonen=kohonen.getFrame(frame);
+    //cout<<"Кохонен завершен"<<endl;
     //imshow( "kohonen", frame_kohonen);
 
-    //Kmeans kmeans;
-    //Mat frame_kmeans=kmeans.getFrame(frame);
-    //imshow( "kmeans", frame_kmeans );
+    Kmeans kmeans;
+    Mat frame_kmeans=kmeans.getFrame(frame);
+    imshow( "kmeans", frame_kmeans );
 
-    getClusters(frame_kohonen);
-    cout<<"Разделение на кластеры окончено"<<endl;
+    //getClusters(frame_kmeans);
+    //cout<<"Разделение на кластеры окончено"<<endl;
 
     //QImage image=gl_view.renderPixmap().toImage();
     //Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
@@ -197,6 +200,7 @@ void Model::updateView()
     QMap<string,double> frameMap;
     double point[2];
     GLdouble coord_z;
+    //toDo=gl_view.toDo;
     if (toDo&&(this->isVisible())&&(capture.read(frame)))
     {
         frameMap.unite(handler.frames.at(countFrame));
@@ -213,26 +217,26 @@ void Model::updateView()
             if (it.key()=="aspect_x"){gl_view.aspect_x=(GLdouble)it.value();}
             if (it.key()=="aspect_y"){gl_view.aspect_y=(GLdouble)it.value();}
         }
+        //cout<<point[0]<<" "<<point[1]<<endl;
         GLdouble maxH=74688;
         GLdouble minH=0;
         GLdouble zmax=1;
         GLdouble zmin=-1;
         GLdouble ah=(zmax-zmin)/(maxH-minH);
         GLdouble bh=zmin-minH*ah;
-
         gl_view.coord_z=ah*(coord_z+200)+bh;
         gl_view.texture_map.transformGCP(point,-1,-1,1,1);
         gl_view.coord_x=point[0];
         gl_view.coord_y=point[1];
         frameMap.clear();
         countFrame++;
-
         imshow("frame",frame);
 
         gl_view.repaint();
         toDo=false;
     }
 }
+
 Model::~Model()
 {
     delete ui;

@@ -34,7 +34,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/alexandra/trash/N3716.sxf</string>
+             <string>/home/alexandra/data/Полет/maps/N3702/N3702.sxf</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -69,7 +69,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/alexandra/trash/3D_R0003.MP4</string>
+             <string>/home/alexandra/data/Полет/video_full.avi</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -104,7 +104,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/alexandra/trash/FLY084.xml</string>
+             <string>/home/alexandra/data/Полет/let2.xml</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -203,7 +203,7 @@
      <x>0</x>
      <y>0</y>
      <width>621</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

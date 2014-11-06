@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonLoadVideo, SIGNAL(clicked()), this, SLOT(LoadVideo()));
     connect(ui->buttonLoadXml, SIGNAL(clicked()), this, SLOT(LoadXml()));
     connect(ui->buttonRun, SIGNAL(clicked()), this, SLOT(Run()));
-
 }
 
 MainWindow::~MainWindow()
@@ -52,5 +51,4 @@ void MainWindow::Run()
     bool cash=ui->checkBoxCash->isChecked();
     Model model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash);
     model.exec();
-    cout<<"end"<<endl;
 }

@@ -1,4 +1,5 @@
 #include "kmeans.h"
+#include "countthreshold.h"
 
 Kmeans::Kmeans()
 {
@@ -10,7 +11,10 @@ Mat  Kmeans::getFrame(Mat parFrame)
         resultFrame.create(parFrame.rows, parFrame.cols,CV_8U);
 
         int k=5;//количество кластеров
-
+        //cv::threshold(parFrame,parFrame,0,255,CV_THRESH_TRUNC|CV_THRESH_OTSU);
+        CountThreshold threshold1;
+        int t=threshold1.gradThreshold(parFrame);
+        threshold(parFrame,parFrame,t,250,CV_THRESH_TRUNC);
         int n = parFrame.rows*parFrame.cols;
         Mat img3xN(n,3,CV_8U);
         vector<Mat> imgRGB;
