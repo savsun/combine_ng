@@ -18,7 +18,7 @@ Texture::Texture(QString filenameMap)
     system->GetExtent(& env);
     OGRDataSource::DestroyDataSource( poDataset );
 }
- void Texture::transformGCP(double point[],int minXPixel,int minYPixel,int maxXPixel,int maxYPixel)
+void Texture::transformGCP(double point[],int minXPixel,int minYPixel,int maxXPixel,int maxYPixel)
 {
      /*float ax=(maxXPixel-minXPixel)/(env.MaxX-env.MinX);
      float bx=minXPixel-ax*env.MinX;

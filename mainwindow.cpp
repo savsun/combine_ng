@@ -11,33 +11,84 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonLoadVideo, SIGNAL(clicked()), this, SLOT(LoadVideo()));
     connect(ui->buttonLoadXml, SIGNAL(clicked()), this, SLOT(LoadXml()));
     connect(ui->buttonRun, SIGNAL(clicked()), this, SLOT(Run()));
+	connect(ui->checkBoxIsPosition, SIGNAL(toggled(bool)), this, SLOT(refreshUi()));
 
+	checkMap("/home/amv/disser/data/Полет/maps/N3702/N3702.sxf");
+	checkVideo("/home/amv/disser/data/Полет/video_full.avi");
+	checkXml("/home/amv/disser/data/Полет/let2.xml");
+
+	refreshUi();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::refreshUi()
+{
+    ui->buttonRun->setEnabled(! filenameMap.isEmpty());
+	ui->buttonRun->setEnabled(! filenameVideo.isEmpty());
+    ui->buttonRun->setEnabled(! filenameXml.isEmpty());
+
+	ui->spinBoxPosition->setEnabled
+	(
+		ui->checkBoxIsPosition->isChecked()
+		&&
+		! filenameVideo.isEmpty()
+	);
+}
+
 //Обработка кнопки "Обзор" для карты
 void MainWindow::LoadMap()
 {
-    filenameMap=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать карту.."),".", trUtf8("Векторная карта (*.sxf)"));
-    ui->editLoadMap->setText(filenameMap);
-    ui->buttonRun->setEnabled(! filenameMap.toStdString().empty());
+	checkMap(QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать карту.."),".", trUtf8("Векторная карта (*.sxf)")));
 }
+
+void MainWindow::checkMap(QString filename)
+{
+	filenameMap = filename;
+    ui->editLoadMap->setText(filenameMap);
+	
+	refreshUi();
+}
+
 //Обработка кнопки "Обзор" для видео
 void MainWindow::LoadVideo()
 {
-    filenameVideo=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать видео.."),".", trUtf8("Видео (*.avi *.mp4)"));
-    ui->editLoadVideo->setText(filenameVideo);
-    ui->buttonRun->setEnabled(! filenameVideo.toStdString().empty());
+	checkVideo(QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать видео.."),".", trUtf8("Видео (*.avi *.mp4)")));
+}
+
+void MainWindow::checkVideo(QString filename)
+{
+	filenameVideo = filename;
+
+	VideoCapture video(filenameVideo.toStdString());
+
+	if(video.isOpened())
+	{
+		ui->editLoadVideo->setText(filenameVideo);
+		ui->spinBoxPosition->setMaximum(video.get(CV_CAP_PROP_FRAME_COUNT));
+	}
+	else
+	{
+		ui->editLoadVideo->setText("");
+	}
+	
+	refreshUi();
 }
 //Обработка кнопки "Обзор" для Xml
 void MainWindow::LoadXml()
 {
-    filenameXml=QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать файл метаданных.."),".", trUtf8("XML-файл (*.xml)"));
+    checkXml(QFileDialog::getOpenFileName(this, QString::fromUtf8("Выбрать файл метаданных.."),".", trUtf8("XML-файл (*.xml)")));
+}
+
+void MainWindow::checkXml(QString filename)
+{
+	filenameXml = filename;
     ui->editLoadXml->setText(filenameXml);
-    ui->buttonRun->setEnabled(! filenameXml.toStdString().empty());
+	
+	refreshUi();
 }
 
 void MainWindow::Run()
@@ -50,7 +101,8 @@ void MainWindow::Run()
     filenameVideo=ui->editLoadVideo->text();
     filenameXml=ui->editLoadXml->text();
     bool cash=ui->checkBoxCash->isChecked();
-    Model model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash);
+    Model model(filenameMap,filenameVideo,filenameXml,countTexture,dimention,cash,ui->checkBoxIsPosition->isChecked() ? ui->spinBoxPosition->value() - 1 : -1, this);
     model.exec();
     cout<<"end"<<endl;
 }
+

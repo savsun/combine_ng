@@ -17,6 +17,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+	void checkMap(QString filename);
+	void checkVideo(QString filename);
+	void checkXml(QString filename);
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -26,6 +30,7 @@ public slots:
     void LoadVideo();
     void LoadXml();
     void Run();
+	void refreshUi();
 
 private:
     Ui::MainWindow *ui;

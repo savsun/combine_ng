@@ -27,19 +27,11 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     }
 void QMapView::initializeGL()
 {
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     qglClearColor(Qt::blue);//цвет для очистки буфера изображения
     glEnable(GL_TEXTURE_2D);  // установить режим двумерных текстур
     glEnable(GL_DEPTH_TEST); // устанавливает режим проверки глубины пикселей
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     genTextures();
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     m_nMap=createMap();
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
 }
 
 void QMapView::resizeGL(int nWidth, int nHeight)
@@ -54,8 +46,6 @@ void QMapView::resizeGL(int nWidth, int nHeight)
 
 void QMapView::paintGL()
 {
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);//очистить буфер изображения
     glMatrixMode(GL_PROJECTION);//текущая матрица проектирования
     glLoadIdentity();//присваивает матрице проектирования единичную матрицу
@@ -76,8 +66,6 @@ void QMapView::paintGL()
     //cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     }
 
 void QMapView::keyPressEvent(QKeyEvent* keyEvent)
@@ -140,39 +128,25 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
 }*/
 void QMapView::genTextures()
 {
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     QFile fileImage;
     textureID.reset(new GLuint[countTexture*countTexture],std::default_delete<GLuint[]>());
     QImage image[countTexture*countTexture];
     glGenTextures(countTexture*countTexture, textureID.get());
 
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     for (int i=0; i<countTexture*countTexture;i++)
     {
-        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-        printf("Time: %d\n", tm.elapsed());
         QString filenameImage=filenameMap;
         filenameImage.append(QString::number(dimention));
         filenameImage.append(QString::number(countTexture));
         filenameImage.append(QString::number(i));
         filenameImage.append(".png");
         fileImage.setFileName(filenameImage);
-        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-        printf("Time: %d\n", tm.elapsed());
         if ((! fileImage.exists())||cache)
         {
-            printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-            printf("Time: %d\n", tm.elapsed());
             cache=false;
             cout<<"Пересчет текстуры"<<endl;
             texture_map.get(countTexture,dimention);
-            printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-            printf("Time: %d\n", tm.elapsed());
         }
-        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-        printf("Time: %d\n", tm.elapsed());
         image[i].load(fileImage.fileName());
         image[i]=QGLWidget::convertToGLFormat(image[i]);
         glBindTexture(GL_TEXTURE_2D, textureID.get()[i]);
@@ -189,11 +163,7 @@ void QMapView::genTextures()
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);*/ // цвет текселя полностью замещает цвет фрагмента фигуры
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,(GLsizei)image[i].width(),(GLsizei)image[i].height(),0,
                      GL_RGBA, GL_UNSIGNED_BYTE, image[i].bits());
-        printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-        printf("Time: %d\n", tm.elapsed());
     }
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
 }
 QMapView::~QMapView()
 {
@@ -202,8 +172,6 @@ QMapView::~QMapView()
 }
 GLuint QMapView::createMap()
 {
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
     GLuint n = glGenLists(1);
 
     glNewList(n,GL_COMPILE);
@@ -257,7 +225,5 @@ GLuint QMapView::createMap()
 
     glEndList();
 
-    printf("Мы здесь: %s %u\n", __FILE__, __LINE__);
-    printf("Time: %d\n", tm.elapsed());
   return n;
 }

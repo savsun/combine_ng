@@ -20,10 +20,9 @@ bool Parser::endElement (const QString&, const QString&, const QString& str)
 {
     if (str=="frame")
     {
-        result->Transform(1,&frame["y"],&frame["x"],NULL);
-        // xy=transform();
-        // frame["y"]=xy.get()[0];
-        // frame["x"]=xy.get()[1];
+		if(frame["coord_system"] == 2)
+	        result->Transform(1,&frame["y"],&frame["x"],NULL);
+
         frames.push_back(frame);
     }
     else // str != frame

@@ -22,7 +22,8 @@ class Model : public QDialog
     QMapView gl_view;
     Parser handler;
     VideoCapture capture;
-    int countFrame;
+	bool is_position, is_read;
+    int position;
     Mat frame;
     Mat marks;
     vector<unsigned> nonclassifier;
@@ -36,7 +37,7 @@ public slots:
 public:
     vector<vector<Point> > collectionClusters;
     void getClusters(Mat frame);
-    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,bool cache,QWidget *parent = 0);
+    explicit Model(QString filenameMap,QString filenameVideo,QString filenameXml,int countTexture,int dimention,bool cache,int __position,QWidget *parent = 0);
     ~Model();
 private:
     Ui::Model *ui;
