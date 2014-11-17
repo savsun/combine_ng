@@ -1,15 +1,16 @@
 #include "model.h"
 #include "ui_model.h"
 
-Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, int countTexture, int dimention, bool cache, QWidget *parent) :
+Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, int countTexture, int dimention, bool cache, int __position, QWidget *parent) :
     QDialog(parent),timer(this),
-    ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cache, this)
+    ui(new Ui::Model),gl_view(filenameMap, filenameVideo,filenameXml, countTexture,dimention,cache, this),
+	is_position(__position >= 0), is_read(false), position(max(0, __position))
 {
     if(! capture.open(filenameVideo.toStdString()))
             throw 1;
-    countFrame=0;
-    //capture.set(CV_CAP_PROP_POS_MSEC,(countFrame-3152)*10);
-    //cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
+
+    if(is_position)
+	capture.set(CV_CAP_PROP_POS_FRAMES, position);
 
     capture.read(frame);
 
@@ -194,46 +195,51 @@ void Model::doClassification()
     //cout<<"Классификация закончена"<<endl;
     collectionClusters.clear();
 }
-bool toDo=true;
 void Model::updateView()
 {
+    //cout<<capture.get(CV_CAP_PROP_POS_FRAMES)<<endl;
+    //cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
     QMap<string,double> frameMap;
     double point[2];
     GLdouble coord_z;
-    //toDo=gl_view.toDo;
-    if (toDo&&(this->isVisible())&&(capture.read(frame)))
+    if (this->isVisible())
     {
-        frameMap.unite(handler.frames.at(countFrame));
-        QMap<string,double>::iterator it=frameMap.begin();
-        for (;it != frameMap.end(); ++it)
-        {
-            //В Xml координаты x и у поменяны местами
-            if (it.key()=="x") {point[1]=(GLdouble)it.value();}
-            if (it.key()=="y"){point[0]=(GLdouble)it.value();}
-            if (it.key()=="h"){coord_z=(GLdouble)it.value();}
-            if (it.key()=="course"){gl_view.course=(GLdouble)it.value();}
-            if (it.key()=="pitch"){gl_view.pitch=(GLdouble)it.value();}
-            if (it.key()=="roll"){gl_view.roll=(GLdouble)it.value();}
-            if (it.key()=="aspect_x"){gl_view.aspect_x=(GLdouble)it.value();}
-            if (it.key()=="aspect_y"){gl_view.aspect_y=(GLdouble)it.value();}
-        }
-        //cout<<point[0]<<" "<<point[1]<<endl;
-        GLdouble maxH=74688;
-        GLdouble minH=0;
-        GLdouble zmax=1;
-        GLdouble zmin=-1;
-        GLdouble ah=(zmax-zmin)/(maxH-minH);
-        GLdouble bh=zmin-minH*ah;
-        gl_view.coord_z=ah*(coord_z+200)+bh;
-        gl_view.texture_map.transformGCP(point,-1,-1,1,1);
-        gl_view.coord_x=point[0];
-        gl_view.coord_y=point[1];
-        frameMap.clear();
-        countFrame++;
-        imshow("frame",frame);
+	if(! is_position || ! is_read)
+	  is_read = capture.read(frame);
 
-        gl_view.repaint();
-        toDo=false;
+	if(is_read)
+	 {
+	  frameMap.unite(handler.frames.at(position));
+
+			point[1] = frameMap["x"];
+			point[0] = frameMap["y"];
+			coord_z = frameMap["h"];
+			gl_view.course = frameMap["course"];
+			gl_view.pitch = frameMap["pitch"];
+			gl_view.roll = frameMap["roll"];
+			gl_view.aspect_x = frameMap["aspect_x"];
+			gl_view.aspect_y = frameMap["aspect_y"];
+
+			GLdouble maxH=74688;
+			GLdouble minH=0;
+			GLdouble zmax=1;
+			GLdouble zmin=-1;
+			GLdouble ah=(zmax-zmin)/(maxH-minH);
+			GLdouble bh=zmin-minH*ah;
+
+			gl_view.coord_z=ah*(coord_z+200)+bh;
+			gl_view.texture_map.transformGCP(point,-1,-1,1,1);
+			gl_view.coord_x=point[0];
+			gl_view.coord_y=point[1];
+			frameMap.clear();
+
+			if(! is_position)
+				position ++;
+
+			imshow("frame",frame);
+
+			gl_view.repaint();
+		}
     }
 }
 
