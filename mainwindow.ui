@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>621</width>
-    <height>336</height>
+    <height>353</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,11 @@
      <layout class="QVBoxLayout" name="verticalLayout_8">
       <item>
        <widget class="QToolBox" name="toolBox">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -27,122 +32,151 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>603</width>
-           <height>193</height>
+           <width>601</width>
+           <height>209</height>
           </rect>
          </property>
          <attribute name="label">
           <string>Виртуальная модель местности</string>
          </attribute>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Загрузить карту</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                 <widget class="QLineEdit" name="editLoadMap">
-                  <property name="focusPolicy">
-                   <enum>Qt::NoFocus</enum>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="readOnly">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="buttonLoadMap">
-                  <property name="text">
-                   <string>Обзор</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
+         <widget class="QLabel" name="label">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>40</y>
+            <width>211</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Загрузить карту</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="editLoadMap">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>80</y>
+            <width>481</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="buttonLoadMap">
+          <property name="geometry">
+           <rect>
+            <x>510</x>
+            <y>80</y>
+            <width>80</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Обзор</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="page_2">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>603</width>
-           <height>193</height>
+           <width>601</width>
+           <height>209</height>
           </rect>
          </property>
          <attribute name="label">
           <string>Текстуры</string>
          </attribute>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QCheckBox" name="checkBoxCash">
-              <property name="text">
-               <string>Игнорировать кэш</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <item>
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>Количество текстур N*N: N=</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_5">
-                  <property name="text">
-                   <string>Размеры текстуры</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
-                <item>
-                 <widget class="QLineEdit" name="editCountTexture">
-                  <property name="text">
-                   <string>4</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="editDimentionTexture">
-                  <property name="text">
-                   <string>512</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
+         <widget class="QCheckBox" name="checkBoxCash">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>120</y>
+            <width>180</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Игнорировать кэш</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_4">
+          <property name="geometry">
+           <rect>
+            <x>12</x>
+            <y>43</y>
+            <width>238</width>
+            <height>19</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Количество текстур N*N: N=</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_5">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>80</y>
+            <width>154</width>
+            <height>19</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Размеры текстуры</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="editCountTexture">
+          <property name="geometry">
+           <rect>
+            <x>300</x>
+            <y>40</y>
+            <width>176</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="editDimentionTexture">
+          <property name="geometry">
+           <rect>
+            <x>300</x>
+            <y>70</y>
+            <width>176</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>512</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="page_3">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>601</width>
+           <height>209</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Видео</string>
          </attribute>
@@ -208,6 +242,11 @@
             </item>
             <item>
              <widget class="QGroupBox" name="groupBox">
+              <property name="font">
+               <font>
+                <pointsize>11</pointsize>
+               </font>
+              </property>
               <property name="title">
                <string>Позиционировать на кадр</string>
               </property>

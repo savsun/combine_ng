@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonRun, SIGNAL(clicked()), this, SLOT(Run()));
     connect(ui->checkBoxIsPosition, SIGNAL(toggled(bool)), this, SLOT(refreshUi()));
 
-    checkMap("/home/amv/disser/data/Полет/maps/N3702/N3702.sxf");
-    checkVideo("/home/amv/disser/data/Полет/video_full.avi");
-    checkXml("/home/amv/disser/data/Полет/let2.xml");
+    checkMap("/home/alexandra/trash/N3716.sxf");
+    checkVideo("/home/alexandra/trash/3D_R0003.MP4");
+    checkXml("/home/alexandra/trash/FLY084.xml");
 
     refreshUi();
 }
