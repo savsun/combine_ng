@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Model</class>
- <widget class="QWidget" name="Model">
+ <widget class="QDialog" name="Model">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>742</width>
-    <height>598</height>
+    <width>822</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">

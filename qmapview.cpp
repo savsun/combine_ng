@@ -1,6 +1,6 @@
 #include "qmapview.h"
 
-QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cash, QWidget *parent) :
+QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache, QWidget *parent) :
     texture_map(_filenameMap),QGLWidget(parent),pitch(0),roll(0),course(0), coord_x(0),coord_y(0),coord_z(0.1)
 {
     filenameMap=_filenameMap;
@@ -8,7 +8,9 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     filenameXml=_filenameXml;
     countTexture=_countTexture;
     dimention=_dimention;
-    cash=_cash;
+    cache=_cache;
+    aspect_x=45;
+    aspect_y=45;
 }
 #define PAIR(top, bottom, param, step)\
     case top:\
@@ -27,12 +29,6 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     }
 void QMapView::initializeGL()
 {
-    QFile fileXml(filenameXml);
-    QXmlInputSource source(&fileXml);
-    QXmlSimpleReader reader;
-    reader.setContentHandler(&handler);
-    reader.parse(source);
-
     qglClearColor(Qt::blue);//цвет для очистки буфера изображения
     glEnable(GL_TEXTURE_2D);  // установить режим двумерных текстур
     glEnable(GL_DEPTH_TEST); // устанавливает режим проверки глубины пикселей
@@ -69,8 +65,7 @@ void QMapView::paintGL()
     glRotated(-pitch-90, 1, 0, 0);
     glRotated(-roll, 0, 1, 0);
     glRotated(course, 0, 0, 1);
-    //glRotatef(course +90, 0, 0, 1);// Докрутка на север
-    cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<pitch<<" "<<roll<<" "<<course<<" "<<aspect_x<<" "<<aspect_y<<endl;
+    cout<<coord_x<<" "<<coord_y<<" "<<coord_z<<" "<<course<<" "<<roll<<" "<<pitch<<" "<<aspect_x<<" "<<aspect_y<<endl;
     glTranslated(-coord_x, - coord_y, - coord_z);
     glCallList(m_nMap);
 }
@@ -103,14 +98,22 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         }
         imshow("result",result);
         delete buf[];*/
-        QImage image=renderPixmap().toImage();
-        Mat result1(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
-        imshow("result1",result1);
+        doClassification();
+        break;
+    }
+    case Qt::Key_End:
+    {
+        toDo=false;
+        break;
+    }
+    case Qt::Key_Enter:
+    {
+        toDo=true;
         break;
     }
         PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);
         PAIR(Qt::Key_W, Qt::Key_S, coord_y, 0.01);
-        PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.01);
+        PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.0001);
         PAIR(Qt::Key_R, Qt::Key_F, course, 1);
         PAIR(Qt::Key_T, Qt::Key_G, roll, 1);
         PAIR(Qt::Key_Y, Qt::Key_H, pitch, 1);
@@ -138,10 +141,9 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
 void QMapView::genTextures()
 {
     QFile fileImage;
-    textureID=new GLuint[countTexture*countTexture];
+    textureID.reset(new GLuint[countTexture*countTexture],std::default_delete<GLuint[]>());
     QImage image[countTexture*countTexture];
-    glGenTextures(countTexture*countTexture, textureID);
-
+    glGenTextures(countTexture*countTexture, textureID.get());
 
     for (int i=0; i<countTexture*countTexture;i++)
     {
@@ -151,32 +153,31 @@ void QMapView::genTextures()
         filenameImage.append(QString::number(i));
         filenameImage.append(".png");
         fileImage.setFileName(filenameImage);
-        if ((! fileImage.exists())||cash)
+        if ((! fileImage.exists())||cache)
         {
-            cash=false;
+            cache=false;
             cout<<"Пересчет текстуры"<<endl;
             texture_map.get(countTexture,dimention);
         }
         image[i].load(fileImage.fileName());
         image[i]=QGLWidget::convertToGLFormat(image[i]);
-        glBindTexture(GL_TEXTURE_2D, textureID[i]);
+        glBindTexture(GL_TEXTURE_2D, textureID.get()[i]);
         // дополнительные параметры текстурного объекта
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // задана линейная фильтрация вблизи
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // задана линейная фильтрация вдали
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // при фильтрации игнорируются тексели, выходящие за границу текстуры для s координаты
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // при фильтрации игнорируются тексели, выходящие за границу текстуры для t координаты
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // цвет текселя полностью замещает цвет фрагмента фигуры
-        /* textureID=bindTexture(QPixmap(QString(texture_map.get("/home/alexandra/N3716.sxf"))), GL_TEXTURE_2D);
-        // далее параметры текстурного объекта
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // при фильтрации игнорируются тексели, выходящие за границу текстуры для s координаты
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // при фильтрации игнорируются тексели, выходящие за границу текстуры для t координаты
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);*/ // цвет текселя полностью замещает цвет фрагмента фигуры
+
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,(GLsizei)image[i].width(),(GLsizei)image[i].height(),0,
                      GL_RGBA, GL_UNSIGNED_BYTE, image[i].bits());
     }
-
 }
-
+QMapView::~QMapView()
+{
+    glDeleteLists(m_nMap,1);
+    glDeleteTextures(countTexture*countTexture,textureID.get());
+}
 GLuint QMapView::createMap()
 {
     GLuint n = glGenLists(1);
@@ -199,7 +200,7 @@ GLuint QMapView::createMap()
        for (int i=0; i<countTexture*countTexture;i++)
         {
 
-            glBindTexture(GL_TEXTURE_2D, textureID[i]);
+            glBindTexture(GL_TEXTURE_2D, textureID.get()[i]);
             glBegin(GL_QUADS);//четырехугольник
             //qglColor(Qt::white);
 
