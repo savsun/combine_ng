@@ -7,8 +7,8 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 {
     if(! capture.open(filenameVideo.toStdString()))
             throw 1;
-    countFrame=0;
-    //capture.set(CV_CAP_PROP_POS_MSEC,(countFrame-3152)*10);
+    countFrame=58000;
+    capture.set(CV_CAP_PROP_POS_MSEC,(countFrame-3152)*10);
     //cout<<capture.get(CV_CAP_PROP_FRAME_COUNT)<<endl;
 
     capture.read(frame);
