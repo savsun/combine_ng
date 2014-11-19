@@ -35,7 +35,7 @@ protected:
 public:
 
     bool toDo;
-
+    int frame_count;
     double point[2];
     virtual void initializeGL();
     virtual void resizeGL (int nWidth,int nHeight);
@@ -51,10 +51,11 @@ public:
     GLdouble aspect_x;
     GLdouble aspect_y;
     ~QMapView();
-    explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache,QWidget *parent = 0);
+    explicit QMapView(QString _filenameMap, QString _filenameVideo, QString _filenameXml, int _countTexture, int _dimention, bool _cache, QWidget *parent = 0);
 
 signals:
     void doClassification();
+    void changeXmlFrame();
 
 public slots:
 

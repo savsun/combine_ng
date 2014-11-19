@@ -22,7 +22,7 @@ class Model : public QDialog
     QMapView gl_view;
     Parser handler;
     VideoCapture capture;
-    int countFrame;
+    const int countFrame=58000;
     Mat frame;
     Mat marks;
     vector<unsigned> nonclassifier;
@@ -31,8 +31,9 @@ class Model : public QDialog
     void separation (unsigned cls, vector<Point> &obj, Mat img, Mat marks, int x, int y);
     void classification(vector<vector<Point> > collectionClusters, Mat perspective, int T);
 public slots:
-    void updateView();
+    //void updateView();
     void doClassification();
+    void changeXmlFrame();
 public:
     vector<vector<Point> > collectionClusters;
     void getClusters(Mat frame);

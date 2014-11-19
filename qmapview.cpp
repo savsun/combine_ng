@@ -9,8 +9,14 @@ QMapView::QMapView(QString _filenameMap, QString _filenameVideo, QString _filena
     countTexture=_countTexture;
     dimention=_dimention;
     cache=_cache;
-    aspect_x=45;
-    aspect_y=45;
+    coord_x=0.561648;
+    coord_y=0.945259;
+    coord_z=-0.997256;
+    course=-3330.65;
+    roll=5.06294;
+    pitch=-19.427;
+    aspect_x=65.5;
+    aspect_y=64.4;
 }
 #define PAIR(top, bottom, param, step)\
     case top:\
@@ -111,8 +117,20 @@ void QMapView::keyPressEvent(QKeyEvent* keyEvent)
         toDo=true;
         break;
     }
-        PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.01);
-        PAIR(Qt::Key_W, Qt::Key_S, coord_y, 0.01);
+    case Qt::Key_Right:
+    {
+        frame_count++;
+        changeXmlFrame();
+        break;
+    }
+    case Qt::Key_Left:
+    {
+        frame_count--;
+        changeXmlFrame();
+        break;
+    }
+        PAIR(Qt::Key_Q, Qt::Key_A, coord_x, 0.0001);
+        PAIR(Qt::Key_W, Qt::Key_S, coord_y, 0.0001);
         PAIR(Qt::Key_E, Qt::Key_D, coord_z, 0.0001);
         PAIR(Qt::Key_R, Qt::Key_F, course, 1);
         PAIR(Qt::Key_T, Qt::Key_G, roll, 1);

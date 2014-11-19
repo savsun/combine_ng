@@ -104,7 +104,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
-             <string>/home/alexandra/trash/FLY084.xml</string>
+             <string>/home/alexandra/trash/fly084.xml</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
