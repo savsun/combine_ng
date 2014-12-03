@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <kohonen.h>
 #include <kmeans.h>
+#include <kmeansopencv.h>
 
 namespace Ui {
 class Model;

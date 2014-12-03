@@ -31,7 +31,7 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
     //changeXmlFrame();
 
     connect(&gl_view,SIGNAL(changeXmlFrame()),this,SLOT(changeXmlFrame()));
-    //connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
+    connect(&gl_view,SIGNAL(doClassification()),this,SLOT(doClassification()));
 
     //connect(&timer, SIGNAL(timeout()), this, SLOT(updateView()));
     //timer.start(40);
@@ -62,7 +62,10 @@ Model::Model(QString filenameMap, QString filenameVideo, QString filenameXml, in
 
 void Model::getClusters(Mat frame)
 {
-    int B=40;
+    Mat classificated=Mat::zeros(frame.rows,frame.cols, CV_8UC3);
+    //счетчик
+    uint32_t sc;
+    int B=600;
     cout<<"Разделение на кластеры"<<endl;
     uint32_t cls;
     //marks=Mat::zeros(frame.rows,frame.cols,CV_32S);
@@ -91,7 +94,7 @@ void Model::getClusters(Mat frame)
                     {
                        if (marks.at<uint32_t>(wu,wv)==cls)
                        {
-                           cluster.push_back(Point(wu,wv));
+                           cluster.push_back(Point(wv,wu));
                            marks.at<uint32_t>(wu,wv)=-1;
                        }
                     }
@@ -99,10 +102,19 @@ void Model::getClusters(Mat frame)
                 {
                     cout<<cluster[i]<<" ";
                 }*/
+
                 collectionClusters.push_back(cluster);
             }
         }
     cout<<collectionClusters.size()<<endl;
+    for(int i=0;i<collectionClusters.size();i++)
+    {
+        Point * ptrCluster=collectionClusters[i].data();
+        int numberPoint=collectionClusters[i].size();
+        fillPoly(classificated,(const Point**)&ptrCluster,&numberPoint,1,Scalar(((0xFF0000&sc)>>16),((0x00FF00&sc)>>8),(0x0000FF&sc)),8,0,Point());
+        sc+=0xFFFFFF/3000;
+    }
+    imshow("classificated",classificated);
 }
 
 /*void Model::getClusters(Mat frame)
@@ -186,19 +198,23 @@ void Model::doClassification()
     //cout<<"Кохонен завершен"<<endl;
     //imshow( "kohonen", frame_kohonen);
 
-    Kmeans kmeans;
-    Mat frame_kmeans=kmeans.getFrame(frame);
-    imshow( "kmeans", frame_kmeans );
+    /*Kmeans kmeans(5,frame,100,0.01);
+    Mat frame_kmeans=kmeans.getFrame();
+    imshow( "kmeans", frame_kmeans );*/
 
-    //getClusters(frame_kmeans);
-    //cout<<"Разделение на кластеры окончено"<<endl;
+    KMeansOpenCV kmeans1;
+    Mat frame_kmeans1=kmeans1.getFrameOCV(frame);
+    imshow( "kmeans1", frame_kmeans1);
+
+    getClusters(frame_kmeans1);
+    cout<<"Разделение на кластеры окончено"<<endl;
 
     //QImage image=gl_view.renderPixmap().toImage();
     //Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
     //classification(collectionClusters,perspective,50);
     //classification(collectionClusters,Mat::zeros(frame.rows,frame.cols,CV_32SC1),50);
     //cout<<"Классификация закончена"<<endl;
-    collectionClusters.clear();
+    //collectionClusters.clear();
 }
 void Model::changeXmlFrame()
 {

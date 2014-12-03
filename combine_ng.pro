@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     parser.cpp \
     kohonen.cpp \
     kmeans.cpp \
-    countthreshold.cpp
+    countthreshold.cpp \
+    kmeansopencv.cpp
 
 HEADERS  += mainwindow.h \
     qmapview.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     parser.h \
     kohonen.h \
     kmeans.h \
-    countthreshold.h
+    countthreshold.h \
+    kmeansopencv.h
 
 INCLUDEPATH += "/usr/include/GL"
 FORMS    += mainwindow.ui \
