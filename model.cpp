@@ -198,16 +198,16 @@ void Model::doClassification()
     //cout<<"Кохонен завершен"<<endl;
     //imshow( "kohonen", frame_kohonen);
 
-    /*Kmeans kmeans(5,frame,100,0.01);
+    Kmeans kmeans(5,frame,100,0.01);
     Mat frame_kmeans=kmeans.getFrame();
-    imshow( "kmeans", frame_kmeans );*/
+    imshow( "kmeans", frame_kmeans );
 
-    KMeansOpenCV kmeans1;
-    Mat frame_kmeans1=kmeans1.getFrameOCV(frame);
-    imshow( "kmeans1", frame_kmeans1);
+    //KMeansOpenCV kmeans1;
+    //Mat frame_kmeans1=kmeans1.getFrameOCV(frame);
+    //imshow( "kmeans1", frame_kmeans1);
 
-    getClusters(frame_kmeans1);
-    cout<<"Разделение на кластеры окончено"<<endl;
+    //getClusters(frame_kmeans1);
+    //cout<<"Разделение на кластеры окончено"<<endl;
 
     //QImage image=gl_view.renderPixmap().toImage();
     //Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());

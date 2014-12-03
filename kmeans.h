@@ -1,26 +1,17 @@
 #ifndef KMEANS_H
 #define KMEANS_H
 #include <all.h>
-//Структура для описание цветного пикселя
-struct PixelRgb
-{
-    //unsigned X;
-    //unsigned Y;
-    unsigned Red;
-    unsigned Green;
-    unsigned Blue;
-};
 
 class Kmeans{
 
-    static double distance(PixelRgb parFirstPixel,PixelRgb parSecondPixel);//Расчет растояния между двумя пикселями
+    static double distance(Vec3b parFirstPixel, Vec3b parSecondPixel);//Расчет растояния между двумя пикселями
     double distance(int parClusterIndex, int parCol, int parRow);//Расчет растояния между центром кластера с текущим пикселем
     void init();//Инициализация массивов центроидов и пикселей сегментируемого изображения
     void pixelClustering();//Отнесение пикселя к сегментам
-    PixelRgb* newCenterPositions();//Получение новых позиций центроидов
+    Vec3b* newCenterPositions();//Получение новых позиций центроидов
 
     Mat _Frame;
-    PixelRgb* _ClusterCenters;//Центры кластеров
+    Vec3b* _ClusterCenters;//Центры кластеров
     bool _CentersFound;//Центры кластеров были найдены
     int _ClusterCount;//Количество кластеров
     int _LastIterationCount;//Количество итераций при последней сегментации
