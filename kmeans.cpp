@@ -12,10 +12,7 @@ Kmeans::Kmeans(int parClusterCount,Mat parFrame,int parMaxIterationCount,double 
     _Precision = parPrecision;
 
     _ClusterCenters = NULL;
-
-    _LastIterationCount = 0;
-    //_CentersFound = false;
-    //_PixelsClustered = false;
+    _CentersFound = false;
 
     //Инициализация массива номеров кластеров для каждого пикселя
     _Labels=Mat::zeros(parFrame.rows,parFrame.cols,CV_8UC1);
@@ -100,10 +97,10 @@ void Kmeans::pixelClustering()
 }
 
 //Получение новых позиций центроидов
-Vec3b *Kmeans::newCenterPositions()
+void *Kmeans::newCenterPositions()
 {
     //Новые координаты центроида
-    Vec3b* newCenterPositioins = new Vec3b[_ClusterCount];
+    Vec3d* newCenterPositioins = new Vec3d[_ClusterCount];
 
     //Пикселей в кластере
     int* pixelInCluster = new int[_ClusterCount];
@@ -118,7 +115,6 @@ Vec3b *Kmeans::newCenterPositions()
         newCenterPositioins[k][2] = 0;
     }
 
-
     //Расчет новых значений центроидов
     unsigned numberCluster;
     for (int i = 0; i <_Frame.rows; i++)
@@ -130,10 +126,11 @@ Vec3b *Kmeans::newCenterPositions()
             //Значение нового центра - среднее арифметическое
             newCenterPositioins[numberCluster][0] += _Frame.at<Vec3b>(i,j)[0];
             newCenterPositioins[numberCluster][1] += _Frame.at<Vec3b>(i,j)[1];
-            newCenterPositioins[numberCluster][2] +=_Frame.at<Vec3b>(i,j)[2];
+            newCenterPositioins[numberCluster][2] += _Frame.at<Vec3b>(i,j)[2];
         }
     }
 
+    //cout<<"New"<<endl;
     for (int k = 0; k < _ClusterCount; k++)
     {
         if (pixelInCluster[k] != 0)
@@ -141,12 +138,30 @@ Vec3b *Kmeans::newCenterPositions()
             newCenterPositioins[k][0] /= (double)pixelInCluster[k];
             newCenterPositioins[k][1] /= (double)pixelInCluster[k];
             newCenterPositioins[k][2] /= (double)pixelInCluster[k];
+            //cout<<(int)newCenterPositioins[k][0]<<" "<<(int)newCenterPositioins[k][1]<<" "<<(int)newCenterPositioins[k][2]<<endl;
         }
     }
 
+    /*cout<<"Old"<<endl;
+    for (int k = 0; k < _ClusterCount; k++)
+    {
+        cout<<(int)_ClusterCenters[k][0]<<" "<<(int)_ClusterCenters[k][1]<<" "<<(int)_ClusterCenters[k][2]<<endl;
+    };*/
+    //Проверка условия выполнения точности
+    bool flag=true;//истина,если нет изменения во всех класерах
+    for (int k = 0; k < _ClusterCount; k++)
+    {
+        if (distance(newCenterPositioins[k],_ClusterCenters[k])>_Precision)
+        {
+             _ClusterCenters[k] = newCenterPositioins[k];
+             flag=false;
+        }
+    }
+    if (flag) {_CentersFound=true;}
+
+
     delete[] newCenterPositioins;
     delete [] pixelInCluster;
-    return newCenterPositioins;
 }
 //реализация kmeans без opencv
 Mat Kmeans::getFrame()
@@ -155,14 +170,17 @@ Mat Kmeans::getFrame()
     //Заполняем _ClustersCenters
        init();
 
-    for (int i=1;i != _MaxIterationCount;i++)
-     {
-        //Относим пиксели к кластерам
-        pixelClustering();
+       int i=1;
+       while ((!_CentersFound) && (i != _MaxIterationCount))
+       {
+            //Относим пиксели к кластерам
+            pixelClustering();
+            //Определение новых центров
+            newCenterPositions();
 
-        //Определение новых центров
-        newCenterPositions();
-    }
+            i++;
+       }
+       cout<<"Количество пересчетов "<<i<<endl;
     return _Labels;
 }
 

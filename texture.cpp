@@ -4,9 +4,22 @@ Texture::Texture(QString filenameMap)
 {
     _filenameMap=filenameMap;
 
+    //GDALAllRegister();
+    //GDALDataset *poDataset;
+    //OGRSFDriverH *  	poDriver;
+
+    //poDataset = (GDALDataset *) GDALDriverManager::(_filenameMap.toStdString().c_str(),0,poDriver);
+
     OGRRegisterAll();
-    OGRDataSource   *poDataset;
-    poDataset = OGRSFDriverRegistrar::Open(_filenameMap.toStdString().c_str());
+    OGRDataSource *poDataset;
+    OGRSFDriverH  *paDriver;
+    //RegisterOGRSXF();
+    GDALDriverManager mng;
+    paDriver=(OGRSFDriverH *) mng.GetDriverByName("OGRSXF");
+    poDataset = (OGRDataSource *) OGROpen(_filenameMap.toStdString().c_str(),0,paDriver);
+    //_filenameMap.toStdString().c_str(), GA_ReadOnly);
+
+    //poDataset = OGRSFDriverRegistrar::Open(_filenameMap.toStdString().c_str());
     if( poDataset == NULL )
         {
             printf( "Open failed.\n" );
@@ -16,7 +29,9 @@ Texture::Texture(QString filenameMap)
     system=poDataset->GetLayerByName("SYSTEM");
     //Получение размеров рамки
     system->GetExtent(& env);
-    OGRDataSource::DestroyDataSource( poDataset );
+    //OGRDataSource::DestroyDataSource( poDataset );
+    OGRReleaseDataSource( poDataset );
+    //GDALClose(poDataset);
 }
  void Texture::transformGCP(double point[],int minXPixel,int minYPixel,int maxXPixel,int maxYPixel)
 {
@@ -68,9 +83,17 @@ Texture::Texture(QString filenameMap)
 
 void Texture::get(int countTexture, int dimention)
 {
+    //GDALAllRegister();
+    //GDALDataset   *poDataset;
+    //poDataset = (GDALDataset *) GDALOpen( _filenameMap.toStdString().c_str(), GA_ReadOnly);
+    //poDataset = OGRSFDriverRegistrar::GetOpenDS(_filenameMap.toStdString().c_str());
     OGRRegisterAll();
-    OGRDataSource   *poDataset;
-    poDataset = OGRSFDriverRegistrar::Open(_filenameMap.toStdString().c_str());
+    OGRDataSource *poDataset;
+    OGRSFDriverH  *paDriver;
+    //RegisterOGRSXF();
+    GDALDriverManager mng;
+    paDriver=(OGRSFDriverH *) mng.GetDriverByName("OGRSXF");
+    poDataset = (OGRDataSource *) OGROpen(_filenameMap.toStdString().c_str(),0,paDriver);
     if( poDataset == NULL )
         {
             printf( "Open failed.\n" );
@@ -180,5 +203,7 @@ void Texture::get(int countTexture, int dimention)
             k++;
             }
     }
-    OGRDataSource::DestroyDataSource( poDataset );
+    //OGRDataSource::DestroyDataSource( poDataset );
+    //GDALClose(poDataset);
+    OGRReleaseDataSource( poDataset );
 }

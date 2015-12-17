@@ -206,8 +206,8 @@ void Model::doClassification()
     //Mat frame_kmeans1=kmeans1.getFrameOCV(frame);
     //imshow( "kmeans1", frame_kmeans1);
 
-    //getClusters(frame_kmeans1);
-    //cout<<"Разделение на кластеры окончено"<<endl;
+    getClusters(frame_kmeans);
+    cout<<"Разделение на кластеры окончено"<<endl;
 
     //QImage image=gl_view.renderPixmap().toImage();
     //Mat perspective(height(),width(),CV_8UC4,image.bits(),image.bytesPerLine());
