@@ -138,7 +138,7 @@ void Texture::get(int countTexture, int dimention)
             {
                 OGRGeometry *poGeometry;
                 poGeometry = poFeature->GetGeometryRef();
-                if (poGeometry != NULL && poGeometry->getGeometryType() == wkbPolygon)
+                if (poGeometry != NULL && poGeometry->getGeometryType() == wkbPolygon25D)
                 {
                     OGRPolygon *poPolygon = (OGRPolygon *)  poGeometry;
 
